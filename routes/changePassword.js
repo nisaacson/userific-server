@@ -38,6 +38,7 @@ module.exports = function(backend) {
  */
 function validateParameters(req) {
   req.assert('currentPassword', 'required').notEmpty()
+  req.assert('email', 'required').isEmail()
   req.assert('newPassword', 'new password must be at least 4 characters long').len(4)
   var errors = req.validationErrors()
   return errors

@@ -23,6 +23,7 @@ describe('Change Password Route', function() {
     method: 'post',
     json: true,
     form: {
+      email: user.email,
       currentPassword: user.password,
       newPassword: newPassword
     }
@@ -61,7 +62,19 @@ describe('Change Password Route', function() {
       done()
     })
   });
-
+it('changePassword post route should give MissingParameter error when email is not supplied', function(done) {
+    var testOpts = ce.clone(opts);
+    delete testOpts.form.email
+    request(testOpts, function(err, res, body) {
+      should.not.exist(err, 'error posting to changePassword route')
+      var status = res.statusCode
+      var desiredStatusCode = new restify.MissingParameterError().statusCode
+      status.should.eql(desiredStatusCode, 'incorrect status code')
+      body.errors.length.should.eql(1)
+      body.errors[0].param.should.eql('email')
+      done()
+    })
+  });
 it('changePassword post route should give MissingParameter error when newPassword is not supplied', function(done) {
     var testOpts = ce.clone(opts);
     delete testOpts.form.newPassword

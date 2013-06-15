@@ -35,7 +35,9 @@
     "mocha": "~1.11.0",
     "request": "~2.21.0",
     "clone-extend": "~0.1.2",
-    "cloneextend": "0.0.3"
+    "cloneextend": "0.0.3",
+    "userific-mongoose": "0.0.2",
+    "mongoose": "~3.6.11"
   },
   "gitHead": "7a3b9dcb806745102c64e736c2b2149191078f79",
   "bugs": {

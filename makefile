@@ -16,3 +16,7 @@ change-email-route:
 	$(MOCHA) test/change-email-route-test.js $(FLAGS)
 change-password-route:
 	$(MOCHA) test/change-password-route-test.js $(FLAGS)
+
+
+integration:
+	$(MOCHA) $(shell find test/integration/* -prune -name "*test.js") $(FLAGS)
