@@ -9,7 +9,10 @@
   "scripts": {
     "test": "make test"
   },
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nisaacson/userific-server.git"
+  },
   "keywords": [
     "userific",
     "user",
@@ -30,5 +33,9 @@
     "should": "~1.2.2",
     "mocha": "~1.11.0",
     "request": "~2.21.0"
+  },
+  "gitHead": "7a3b9dcb806745102c64e736c2b2149191078f79",
+  "bugs": {
+    "url": "https://github.com/nisaacson/userific-server/issues"
   }
 }
