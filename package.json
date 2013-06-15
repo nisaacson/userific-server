@@ -26,13 +26,16 @@
   "license": "BSD",
   "readmeFilename": "README.md",
   "dependencies": {
-    "restify": "~2.6.0"
+    "restify": "~2.6.0",
+    "restify-validator": "~0.3.1"
   },
   "devDependencies": {
     "eyespect": "~0.1.10",
     "should": "~1.2.2",
     "mocha": "~1.11.0",
-    "request": "~2.21.0"
+    "request": "~2.21.0",
+    "clone-extend": "~0.1.2",
+    "cloneextend": "0.0.3"
   },
   "gitHead": "7a3b9dcb806745102c64e736c2b2149191078f79",
   "bugs": {
