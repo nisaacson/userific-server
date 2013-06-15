@@ -1,0 +1,34 @@
+{
+  "name": "userific-server",
+  "version": "0.0.0",
+  "description": "A restful api server to manage users in your application. The server can be used with any userfic backends.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": "",
+  "keywords": [
+    "userific",
+    "user",
+    "registeration",
+    "backend",
+    "api",
+    "rest",
+    "restify"
+  ],
+  "author": "Noah Isaacson",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "restify": "~2.6.0"
+  },
+  "devDependencies": {
+    "eyespect": "~0.1.10",
+    "should": "~1.2.2",
+    "mocha": "~1.11.0",
+    "request": "~2.21.0"
+  }
+}
