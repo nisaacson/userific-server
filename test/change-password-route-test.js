@@ -8,9 +8,10 @@ describe('Change Password Route', function() {
   var user = {
     username: 'fooUsername',
     email: 'foo@example.com',
-    password: 'fooPassword',
+    password: 'barPassword',
     _id: 'fooUserID'
   }
+  var newPassword = 'fooPassword2'
   var backend = {
     changePassword: function(data, cb) {
       return cb(null, user)
@@ -22,8 +23,8 @@ describe('Change Password Route', function() {
     method: 'post',
     json: true,
     form: {
-      email: user.email,
-      password: user.password
+      currentPassword: user.password,
+      newPassword: newPassword
     }
   }
   before(function(done) {
@@ -47,30 +48,30 @@ describe('Change Password Route', function() {
       done()
     })
   });
-  it('changePassword post route should give MissingParameter error when email is not supplied', function(done) {
+  it('changePassword post route should give MissingParameter error when currentPassword is not supplied', function(done) {
     var testOpts = ce.clone(opts);
-    delete testOpts.form.email
+    delete testOpts.form.currentPassword
     request(testOpts, function(err, res, body) {
       should.not.exist(err, 'error posting to changePassword route')
       var status = res.statusCode
       var desiredStatusCode = new restify.MissingParameterError().statusCode
       status.should.eql(desiredStatusCode, 'incorrect status code')
       body.errors.length.should.eql(1)
-      body.errors[0].param.should.eql('email')
+      body.errors[0].param.should.eql('currentPassword')
       done()
     })
   });
 
-it('changePassword post route should give MissingParameter error when password is not supplied', function(done) {
+it('changePassword post route should give MissingParameter error when newPassword is not supplied', function(done) {
     var testOpts = ce.clone(opts);
-    delete testOpts.form.password
+    delete testOpts.form.newPassword
     request(testOpts, function(err, res, body) {
       should.not.exist(err, 'error posting to changePassword route')
       var status = res.statusCode
       var desiredStatusCode = new restify.MissingParameterError().statusCode
       status.should.eql(desiredStatusCode, 'incorrect status code')
       body.errors.length.should.eql(1)
-      body.errors[0].param.should.eql('password')
+      body.errors[0].param.should.eql('newPassword')
       done()
     })
   });

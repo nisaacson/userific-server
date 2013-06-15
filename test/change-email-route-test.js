@@ -11,6 +11,7 @@ describe('Change Email Route', function() {
     password: 'fooPassword',
     _id: 'fooUserID'
   }
+  var newEmail = 'bar@example.com'
   var backend = {
     changeEmail: function(data, cb) {
       return cb(null, user)
@@ -22,8 +23,8 @@ describe('Change Email Route', function() {
     method: 'post',
     json: true,
     form: {
-      email: user.email,
-      password: user.password
+      currentEmail: user.email,
+      newEmail: newEmail
     }
   }
   before(function(done) {
@@ -47,30 +48,30 @@ describe('Change Email Route', function() {
       done()
     })
   });
-  it('changeEmail post route should give MissingParameter error when email is not supplied', function(done) {
+  it('changeEmail post route should give MissingParameter error when currentEmail is not supplied', function(done) {
     var testOpts = ce.clone(opts);
-    delete testOpts.form.email
+    delete testOpts.form.currentEmail
     request(testOpts, function(err, res, body) {
       should.not.exist(err, 'error posting to changeEmail route')
       var status = res.statusCode
       var desiredStatusCode = new restify.MissingParameterError().statusCode
       status.should.eql(desiredStatusCode, 'incorrect status code')
       body.errors.length.should.eql(1)
-      body.errors[0].param.should.eql('email')
+      body.errors[0].param.should.eql('currentEmail')
       done()
     })
   });
 
-it('changeEmail post route should give MissingParameter error when password is not supplied', function(done) {
+it('changeEmail post route should give MissingParameter error when newEmail is not supplied', function(done) {
     var testOpts = ce.clone(opts);
-    delete testOpts.form.password
+    delete testOpts.form.newEmail
     request(testOpts, function(err, res, body) {
       should.not.exist(err, 'error posting to changeEmail route')
       var status = res.statusCode
       var desiredStatusCode = new restify.MissingParameterError().statusCode
       status.should.eql(desiredStatusCode, 'incorrect status code')
       body.errors.length.should.eql(1)
-      body.errors[0].param.should.eql('password')
+      body.errors[0].param.should.eql('newEmail')
       done()
     })
   });
