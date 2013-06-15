@@ -12,3 +12,7 @@ register-route:
 	$(MOCHA) test/register-route-test.js $(FLAGS)
 authenticate-route:
 	$(MOCHA) test/authenticate-route-test.js $(FLAGS)
+change-email-route:
+	$(MOCHA) test/change-email-route-test.js $(FLAGS)
+change-password-route:
+	$(MOCHA) test/change-password-route-test.js $(FLAGS)
