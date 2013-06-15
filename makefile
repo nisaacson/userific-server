@@ -10,3 +10,5 @@ setup:
 	$(MOCHA) test/setup-test.js $(FLAGS)
 register-route:
 	$(MOCHA) test/register-route-test.js $(FLAGS)
+authenticate-route:
+	$(MOCHA) test/authenticate-route-test.js $(FLAGS)
