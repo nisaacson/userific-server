@@ -55,9 +55,11 @@ POST /authenticate
 Change email for an existing user account
 When changing email, the following fields are required
 
-* `currentEmail`
-* `password`
-* `newEmail`
+* `currentEmail` - the email address of the account
+* `password`     - the password used to login to the account
+* `newEmail`     - the new email address of the account
+
+If the `changeEmail` request completes correctly, a status code of `200` will be returned. You can the call the authenticate route using the new email address and password to login
 
 POST /changeEmail
 > Content-Type: application/json
@@ -76,6 +78,14 @@ POST /changeEmail
 
 
 Change password for an existing user account
+
+When changing password, the following fields are required
+
+* `currentPassword` - the password address of the account
+* `email`           - the email address used to login to the account
+* `newpassword`     - the new password of the account
+
+If the `changePassword` request completes correctly, a status code of `200` will be returned. You can the call the authenticate route using the email address and new password to login
 POST /changePassword
 > Content-Type: application/json
 { "email":"foo@example.com", "currentPassword": "fooPassword", "newPassword": "newBarPassword2" }
