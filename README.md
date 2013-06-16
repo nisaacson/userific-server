@@ -1,4 +1,6 @@
 # Userfic Server
+[![Build Status](https://travis-ci.org/nisaacson/userific-server.png)](https://travis-ci.org/nisaacson/userific-server)
+
 A restful api server to manage users in your application. The server can be used with any userfic backends.
 
 # Installation
