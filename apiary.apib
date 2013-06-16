@@ -11,7 +11,7 @@ User Resources
 The following is a section of resources related to user management
 --
 
-Save new products in your shopping cart
+Register a new user account
 POST /register
 > Content-Type: application/json
 { "email":"foo@example.com", "password": "barPassword" }
@@ -21,12 +21,31 @@ POST /register
 +++++
 < 409
 < Content-Type: application/json; charset=utf-8
+{"code": "MissingParameter", "message": "Register failed", "errors": [ { "param": "email", "msg": "required" }]}
++++++
+< 409
+< Content-Type: application/json; charset=utf-8
 {"code": "MissingParameter", "message": "Register failed", "errors": [ { "param": "password", "msg": "password must be at least 4 characters long" }]}
 
--- Payment Resources --
 
-This resource allows you to submit payment information to process your *shopping cart* items
-POST /payment
-{ "cc": "12345678900", "cvc": "123", "expiry": "0112" }
+
+Authenticate an existing user account
+POST /authenticate
+> Content-Type: application/json
+{ "email":"foo@example.com", "password": "barPassword" }
 < 200
-{ "receipt": "/payment/receipt/1" }
+< Content-Type: application/json
+{ "_id": "fooUserID", "email": "foo@example.com" }
++++++
+< 401
+< Content-Type: application/json; charset=utf-8
+{"code":"InvalidCredentials","message":"user not found"}
++++++
+< 409
+< Content-Type: application/json; charset=utf-8
+{"code": "MissingParameter", "message": "Authenticate failed", "errors": [ { "param": "email", "msg": "required" }]}
++++++
+< 409
+< Content-Type: application/json; charset=utf-8
+{"code": "MissingParameter", "message": "Authenticate failed", "errors": [ { "param": "password", "msg": "password must be at least 4 characters long" }]}
+

@@ -1,4 +1,5 @@
 var path = require('path')
+var inspect = require('eyespect').inspector()
 var configFilePath = path.join(__dirname, 'mongo.json')
 var config = require('nconf').file({
   file: configFilePath
@@ -14,13 +15,13 @@ var request = require('request')
 var User
 describe('Mongoose backend routes', function() {
   var baseURL, port, server, user, registerOpts
-  this.timeout('50s')
-  user = {
-    username: 'fooUsername',
-    email: 'foo@example.com',
-    password: 'fooPassword',
-    _id: 'fooUserID'
-  }
+    this.timeout('50s')
+    user = {
+      username: 'fooUsername',
+      email: 'foo@example.com',
+      password: 'fooPassword',
+      _id: 'fooUserID'
+    }
   registerOpts = {
     method: 'post',
     json: true,
@@ -32,9 +33,9 @@ describe('Mongoose backend routes', function() {
 
   before(function(done) {
     var backend, serverConfig
-    backend = new UserificMongoose(mongo)
-    User = backend.User
-    serverConfig = {}
+      backend = new UserificMongoose(mongo)
+      User = backend.User
+      serverConfig = {}
     server = userificServer(backend, serverConfig)
     should.exist(server, 'server object not returned')
     server.listen(0)
@@ -77,12 +78,30 @@ describe('Mongoose backend routes', function() {
         },
         json: true
       }
-      request(authenticateOpts, function (err, res, body) {
+      request(authenticateOpts, function(err, res, body) {
         should.not.exist(err, 'error posting to authenticate route')
         res.statusCode.should.eql(200)
         body.email.should.eql(authenticateOpts.form.email)
         done()
       })
+    })
+  });
+
+  it('authenticate post route should return 401 status code when user is not found', function(done) {
+    var authenticateOpts = {
+      url: baseURL + '/authenticate',
+      method: 'post',
+      form: {
+        email: user.email,
+        password: user.password
+      },
+      json: true
+    }
+    request(authenticateOpts, function(err, res, body) {
+      should.not.exist(err, 'error posting to authenticate route')
+      res.statusCode.should.eql(401)
+      body.code.should.eql('InvalidCredentials')
+      done()
     })
   });
 
@@ -102,7 +121,7 @@ describe('Mongoose backend routes', function() {
         },
         json: true
       }
-      request(changeEmailOpts, function (err, res, body) {
+      request(changeEmailOpts, function(err, res, body) {
         should.not.exist(err, 'error posting to authenticate route')
         res.statusCode.should.eql(200)
         body.email.should.eql(changeEmailOpts.form.newEmail)
@@ -128,7 +147,7 @@ describe('Mongoose backend routes', function() {
         },
         json: true
       }
-      request(changePasswordOpts, function (err, res, body) {
+      request(changePasswordOpts, function(err, res, body) {
         should.not.exist(err, 'error posting to authenticate route')
         res.statusCode.should.eql(200)
 
@@ -141,7 +160,7 @@ describe('Mongoose backend routes', function() {
           json: true,
           url: baseURL + '/authenticate'
         }
-        request(authenticateOpts, function (err, res, body) {
+        request(authenticateOpts, function(err, res, body) {
           should.not.exist(err)
           res.statusCode.should.eql(200)
           body.email.should.eql(user.email)

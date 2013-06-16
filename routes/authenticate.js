@@ -21,8 +21,12 @@ module.exports = function(backend) {
         var outputError = new restify.InternalError(msg)
         return next(outputError)
       }
-      delete user.password
-      res.send(200, user)
+      if (user) {
+        delete user.password
+        res.send(200, user)
+        return
+      }
+      res.send(new restify.InvalidCredentialsError('user not found'))
     })
 
   }

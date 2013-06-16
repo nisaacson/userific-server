@@ -2,7 +2,7 @@ MOCHA=node_modules/.bin/mocha
 REPORTER?=tap
 FLAGS=--reporter $(REPORTER)
 
-test: unit
+test: unit integration
 
 unit:
 	$(MOCHA) $(shell find test/* -prune -name "*test.js") $(FLAGS)
