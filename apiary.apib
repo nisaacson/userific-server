@@ -53,10 +53,9 @@ POST /authenticate
 
 
 Change email for an existing user account
-POST /changePassword
+POST /changeEmail
 > Content-Type: application/json
-{currentPasswordcurrentEmail":"foo@example.com", "password": "fooPasswordnewPassword "newEmail": "newEmail2@example.com" }
-<email
+{"currentEmail":"foo@example.com", "password": "fooPassword "newEmail": "newEmail2@example.com" }
 < Content-Type: application/json
 { "_id": "fooUserID", "email": "newEmail2@example.com" }
 +++++
@@ -67,6 +66,7 @@ POST /changePassword
 < 409
 < Content-Type: application/json; charset=utf-8
 {"code": "MissingParameter", "message": "changeEmail failed", "errors": [ { "param": "currentEmail", "msg": "required" }, { "param": "newEmail", "msg": "required" }, { "param": "password", "msg": "required" }]}
+
 
 Change password for an existing user account
 POST /changePassword
