@@ -1,5 +1,4 @@
 var restify = require('restify')
-var inspect = require('eyespect').inspector({maxLength: 999999})
 /**
  * Register new user route. This route should be called via POST request
  * @param  {Request}   req  the request object. Note that all user data is

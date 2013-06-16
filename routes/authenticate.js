@@ -1,5 +1,4 @@
 var restify = require('restify')
-var inspect = require('eyespect').inspector({maxLength: 999999})
 /**
  * authenticate an existing user route. This route should be called via POST request
  * @param  {Request}   req the request object. Note that all user data is
@@ -22,7 +21,8 @@ module.exports = function(backend) {
         var outputError = new restify.InternalError(msg)
         return next(outputError)
       }
-      res.send(201, user)
+      delete user.password
+      res.send(200, user)
     })
 
   }
