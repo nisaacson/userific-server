@@ -21,19 +21,7 @@ POST /register
 +++++
 < 409
 < Content-Type: application/json; charset=utf-8
-{"code: "MissingParameter", "message": "Register failed", "errors": [ { "param": "password", "msg": "password must be at least 4 characters long" }]}
-+++++
-< 403
-< Content-Type: application/json; charset=utf-8
-< X-Rate-Limit-Remaining: 0
-{"message":"Too many requests, please try again later (see X-Rate-Limit-Remaining header)"}
-+++++
-< 418
-{"message":"Teapot, seriously?"}
-+++++
-< 451
-<message>Legally restricted, sorry</message>
-
+{"code": "MissingParameter", "message": "Register failed", "errors": [ { "param": "password", "msg": "password must be at least 4 characters long" }]}
 
 -- Payment Resources --
 
