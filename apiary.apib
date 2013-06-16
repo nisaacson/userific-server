@@ -13,6 +13,20 @@ The following is a section of resources related to user management
 
 
 Register a new user account
+
+When registering a user account, the following fields are required
+
+* `email`    - the email address used to login to the account
+* `password` - the password used to login to the account'
+
+If the `register` request completes correctly, a status code of `201` will be returned.
+
+If the username or password is incorrect, a status code of `401` will be returned.
+
+If either the username or password is missing, a status code of `409` will be returned.
+
+Finally if there is an error in the server or an error querying the database, a status cod of `500` will be returned
+
 POST /register
 > Content-Type: application/json
 { "email":"foo@example.com", "password": "barPassword" }
@@ -31,6 +45,20 @@ POST /register
 
 
 Authenticate an existing user account
+
+When authenticating a user account, the following fields are required
+
+* `email`    - the email address used to login to the account
+* `password` - the password used to login to the account'
+
+If the `authenticate` request completes correctly, a status code of `200` will be returned.
+
+If the username or password is incorrect, a status code of `401` will be returned.
+
+If either the username or password is missing, a status code of `409` will be returned.
+
+Finally if there is an error in the server or an error querying the database, a status cod of `500` will be returned
+
 POST /authenticate
 > Content-Type: application/json
 { "email":"foo@example.com", "password": "barPassword" }
