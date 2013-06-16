@@ -55,7 +55,8 @@ POST /authenticate
 Change email for an existing user account
 POST /changeEmail
 > Content-Type: application/json
-{"currentEmail":"foo@example.com", "password": "fooPassword "newEmail": "newEmail2@example.com" }
+{ "currentEmail":"foo@example.com", "password": "fooPassword", "newEmail": "newEmail2@example.com" }
+< 200
 < Content-Type: application/json
 { "_id": "fooUserID", "email": "newEmail2@example.com" }
 +++++
@@ -66,23 +67,6 @@ POST /changeEmail
 < 409
 < Content-Type: application/json; charset=utf-8
 {"code": "MissingParameter", "message": "changeEmail failed", "errors": [ { "param": "currentEmail", "msg": "required" }, { "param": "newEmail", "msg": "required" }, { "param": "password", "msg": "required" }]}
-
-
-Change password for an existing user account
-POST /changePassword
-> Content-Type: application/json
-{ "email":"foo@example.com", "currentPassword": "fooPassword", "newPassword": "newBarPassword2" }
-< 200
-< Content-Type: application/json
-{ "_id": "fooUserID", "email": "foo@example.com" }
-+++++
-< 401
-< Content-Type: application/json; charset=utf-8
-{"code":"InvalidCredentials","message":"user not found"}
-+++++
-< 409
-< Content-Type: application/json; charset=utf-8
-{"code": "MissingParameter", "message": "changePassword failed", "errors": [ { "param": "currentPassword", "msg": "required" }, { "param": "newPassword", "msg": "required" }, { "param": "email", "msg": "required" }]}
 
 
 Ping the server to make sure it online
