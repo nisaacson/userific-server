@@ -53,6 +53,12 @@ POST /authenticate
 
 
 Change email for an existing user account
+When changing email, the following fields are required
+
+* `currentEmail`
+* `password`
+* `newEmail`
+
 POST /changeEmail
 > Content-Type: application/json
 {"currentEmail":"foo@example.com", "password": "fooPassword", "newEmail": "newEmail2@example.com" }
