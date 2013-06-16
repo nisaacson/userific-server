@@ -12,12 +12,12 @@ The following is a section of resources related to user management
 --
 
 Save new products in your shopping cart
-POST /shopping-cart
+POST /register
 > Content-Type: application/json
-{ "product":"1AB23ORM", "quantity": 2 }
+{ "email":"foo@example.com", "password": "barPassword" }
 < 201
 < Content-Type: application/json
-{ "status": "created", "url": "/shopping-cart/2" }
+{ "_id": "fooUserID", "email": "foo@example.com" }
 
 -- Payment Resources --
 
