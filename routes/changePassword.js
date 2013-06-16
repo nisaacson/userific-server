@@ -22,7 +22,7 @@ module.exports = function(backend) {
         var outputError = new restify.InternalError(msg)
         return next(outputError)
       }
-      res.send(201, user)
+      res.send(200, user)
     })
 
   }

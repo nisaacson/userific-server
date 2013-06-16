@@ -12,7 +12,7 @@ var should = require('should')
 var userificServer = require('../../')
 var request = require('request')
 var User
-describe('Test Register Route with live mongoose backend', function() {
+describe('Mongoose backend routes', function() {
   var baseURL, port, server, user, registerOpts
   this.timeout('50s')
   user = {
@@ -86,4 +86,68 @@ describe('Test Register Route with live mongoose backend', function() {
     })
   });
 
-});
+  it('changeEmail post route should be supported', function(done) {
+    request(registerOpts, function(err, res, body) {
+      should.not.exist(err, 'error posting to register route')
+      var status = res.statusCode
+      status.should.eql(201, 'incorrect status code')
+      body.email.should.eql(user.email)
+      var newEmail = 'newEmail2@example.com'
+      var changeEmailOpts = {
+        url: baseURL + '/changeEmail',
+        method: 'post',
+        form: {
+          currentEmail: user.email,
+          newEmail: newEmail
+        },
+        json: true
+      }
+      request(changeEmailOpts, function (err, res, body) {
+        should.not.exist(err, 'error posting to authenticate route')
+        res.statusCode.should.eql(200)
+        body.email.should.eql(changeEmailOpts.form.newEmail)
+        done()
+      })
+    })
+  })
+
+  it('changePassword post route should be supported', function(done) {
+    request(registerOpts, function(err, res, body) {
+      should.not.exist(err, 'error posting to register route')
+      var status = res.statusCode
+      status.should.eql(201, 'incorrect status code')
+      body.email.should.eql(user.email)
+      var newPassword = 'newBarPassword2'
+      var changePasswordOpts = {
+        url: baseURL + '/changePassword',
+        method: 'post',
+        form: {
+          email: user.email,
+          currentPassword: user.password,
+          newPassword: newPassword
+        },
+        json: true
+      }
+      request(changePasswordOpts, function (err, res, body) {
+        should.not.exist(err, 'error posting to authenticate route')
+        res.statusCode.should.eql(200)
+
+        var authenticateOpts = {
+          method: 'post',
+          form: {
+            email: user.email,
+            password: newPassword
+          },
+          json: true,
+          url: baseURL + '/authenticate'
+        }
+        request(authenticateOpts, function (err, res, body) {
+          should.not.exist(err)
+          res.statusCode.should.eql(200)
+          body.email.should.eql(user.email)
+          done()
+        })
+      })
+    })
+  })
+})
