@@ -11,6 +11,7 @@ User Resources
 The following is a section of resources related to user management
 --
 
+
 Register a new user account
 POST /register
 > Content-Type: application/json
@@ -67,3 +68,9 @@ POST /changeEmail
 < Content-Type: application/json; charset=utf-8
 {"code": "MissingParameter", "message": "changeEmail failed", "errors": [ { "param": "currentEmail", "msg": "required" }, { "param": "newEmail", "msg": "required" }, { "param": "password", "msg": "required" }]}
 
+
+Ping the server to make sure it online
+GET /ping
+< 200
+< Content-Type: application/json
+{ "message": "pong"}
