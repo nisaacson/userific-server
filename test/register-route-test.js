@@ -1,4 +1,3 @@
-var inspect = require('eyespect').inspector()
 var restify = require('restify')
 var ce = require('cloneextend')
 var should = require('should')
@@ -69,7 +68,6 @@ it('register post route should give MissingParameter error when password is not 
       should.not.exist(err, 'error posting to register route')
       var status = res.statusCode
       var desiredStatusCode = 409
-      inspect(body,'register body')
       status.should.eql(desiredStatusCode, 'incorrect status code')
       body.errors.length.should.eql(1)
       body.errors[0].param.should.eql('password')
