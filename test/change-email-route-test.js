@@ -43,7 +43,7 @@ describe('Change Email Route', function() {
     request(opts, function(err, res, body) {
       should.not.exist(err, 'error posting to changeEmail route')
       var status = res.statusCode
-      status.should.eql(201, 'incorrect status code')
+      status.should.eql(200, 'incorrect status code')
       body.username.should.eql(user.username)
       done()
     })

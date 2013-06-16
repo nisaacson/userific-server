@@ -42,7 +42,7 @@ describe('Authenticate Route', function() {
     request(opts, function(err, res, body) {
       should.not.exist(err, 'error posting to authenticate route')
       var status = res.statusCode
-      status.should.eql(201, 'incorrect status code')
+      status.should.eql(200, 'incorrect status code')
       body.username.should.eql(user.username)
       done()
     })
@@ -67,7 +67,7 @@ it('authenticate post route should give MissingParameter error when password is 
     request(testOpts, function(err, res, body) {
       should.not.exist(err, 'error posting to authenticate route')
       var status = res.statusCode
-      var desiredStatusCode = new restify.MissingParameterError().statusCode
+      var desiredStatusCode = 409
       status.should.eql(desiredStatusCode, 'incorrect status code')
       body.errors.length.should.eql(1)
       body.errors[0].param.should.eql('password')

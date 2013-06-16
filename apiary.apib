@@ -19,9 +19,9 @@ POST /register
 < Content-Type: application/json
 { "_id": "fooUserID", "email": "foo@example.com" }
 +++++
-< 401
+< 409
 < Content-Type: application/json; charset=utf-8
-{"message":"You have not provided proper request token"}
+{"code: "MissingParameter", "message": "Register failed", "errors": [ { "param": "password", "msg": "password must be at least 4 characters long" }]}
 +++++
 < 403
 < Content-Type: application/json; charset=utf-8
