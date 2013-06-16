@@ -54,8 +54,5 @@ For example say the server is listening on `host: localhost`, `port: 3000` and i
 * `https://localhost:3000/changeEmail`
 * `https://localhost:3000/changePassword`
 
+For more information on the server api, consult the [apiary.io documentation here](http://docs.userificserver.apiary.io/)
 
-
-## Register
-
-To register a new user
