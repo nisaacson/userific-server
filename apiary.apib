@@ -3,21 +3,13 @@ HOST: http://www.google.com/
 --- Userific-Server ---
 
 ---
-Welcome to the our sample API documentation. All comments can be written in (support [Markdown](http://daringfireball.net/projects/markdown/syntax) syntax)
+Welcome to the documentation for the Userific Server project. Userific provides an way to manage users in your application via a rest api. Userific supports several different backends. No matter which backend is used, the RESTful api is the same for the server
 ---
 
 --
-Shopping Cart Resources
-The following is a section of resources related to the shopping cart
+User Resources
+The following is a section of resources related to user management
 --
-
-List products added into your shopping-cart. (comment block again in Markdown)
-GET /shopping-cart
-< 200
-< Content-Type: application/json
-{ "items": [
-{ "url": "/shopping-cart/1", "product":"2ZY48XPZ", "quantity": 1, "name": "New socks", "price": 1.25 }
-] }
 
 Save new products in your shopping cart
 POST /shopping-cart
