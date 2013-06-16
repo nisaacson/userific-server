@@ -15,6 +15,9 @@ describe('Change Password Route', function() {
   var backend = {
     changePassword: function(data, cb) {
       return cb(null, user)
+    },
+    authenticate: function(data, cb) {
+      return cb(null, user)
     }
   }
 

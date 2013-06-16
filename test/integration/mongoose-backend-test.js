@@ -117,7 +117,8 @@ describe('Mongoose backend routes', function() {
         method: 'post',
         form: {
           currentEmail: user.email,
-          newEmail: newEmail
+          newEmail: newEmail,
+          password: user.password
         },
         json: true
       }
@@ -150,7 +151,6 @@ describe('Mongoose backend routes', function() {
       request(changePasswordOpts, function(err, res, body) {
         should.not.exist(err, 'error posting to authenticate route')
         res.statusCode.should.eql(200)
-
         var authenticateOpts = {
           method: 'post',
           form: {

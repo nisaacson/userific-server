@@ -15,6 +15,9 @@ describe('Change Email Route', function() {
   var backend = {
     changeEmail: function(data, cb) {
       return cb(null, user)
+    },
+    authenticate: function(data, cb) {
+      return cb(null, user)
     }
   }
 

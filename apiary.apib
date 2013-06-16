@@ -49,3 +49,20 @@ POST /authenticate
 < Content-Type: application/json; charset=utf-8
 {"code": "MissingParameter", "message": "Authenticate failed", "errors": [ { "param": "password", "msg": "required" }]}
 
+
+
+Change email for an existing user account
+POST /changeEmail
+> Content-Type: application/json
+{ "currentEmail":"foo@example.com", "password": "fooPassword", newEmail": "newEmail2@example.com" }
+< 200
+< Content-Type: application/json
+{ "_id": "fooUserID", "email": "newEmail2@example.com" }
++++++
+< 401
+< Content-Type: application/json; charset=utf-8
+{"code":"InvalidCredentials","message":"user not found"}
++++++
+< 409
+< Content-Type: application/json; charset=utf-8
+{"code": "MissingParameter", "message": "changeEmail failed", "errors": [ { "param": "currentEmail", "msg": "required" }, { "param": "newEmail", "msg": "required" }, { "param": "password", "msg": "required" }]}
