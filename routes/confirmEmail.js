@@ -1,4 +1,3 @@
-var inspect = require('eyespect').inspector()
 var restify = require('restify')
 /**
  * authenticate an existing user route. This route should be called via POST request
@@ -12,21 +11,14 @@ module.exports = function(backend) {
     var params = req.params
     var errors = validateParameters(req)
     if (errors) {
-      var outputError = new restify.MissingParameterError("authenticate failed")
+      var outputError = new restify.MissingParameterError("confirm email failed")
       outputError.body.errors = errors
       return res.send(outputError)
     }
-    backend.authenticate(params, function (err, user) {
-      var outputError
-      inspect(err, 'authenticate error')
-      if (err && err.reason === 'unconfirmed') {
-        outputError = new restify.NotAuthorizedError('authenticate failed')
-        outputError.body.reason = 'unconfirmed'
-        return res.send(outputError)
-      }
+    backend.confirmEmail(params, function (err, user) {
       if (err) {
         var msg = err.message
-        outputError = new restify.InternalError(msg)
+        var outputError = new restify.InternalError(msg)
         return next(outputError)
       }
       if (user) {
@@ -34,7 +26,7 @@ module.exports = function(backend) {
         res.send(200, user)
         return
       }
-      res.send(new restify.InvalidCredentialsError('user not found'))
+      res.send(new restify.InvalidCredentialsError('confirm token not found'))
     })
 
   }
@@ -47,8 +39,7 @@ module.exports = function(backend) {
  * @return {Object} null if the parameters are valid, an error object if they are not
  */
 function validateParameters(req) {
-  req.assert('email', 'required').isEmail()
-  req.assert('password', 'password must be at least 4 characters long').len(4)
+  req.assert('confirmToken', 'required').notNull()
   var errors = req.validationErrors()
   return errors
 }

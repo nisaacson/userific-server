@@ -50,9 +50,11 @@ var server = userificServer(backend, serverConfig)
 For example say the server is listening on `host: localhost`, `port: 3000` and is configured to use `https`. Once the server is setup and listening on port 3000 the following routes are available.
 
 * `https://localhost:3000/register`
+* `https://localhost:3000/confirmEmail`
 * `https://localhost:3000/authenticate`
 * `https://localhost:3000/changeEmail`
 * `https://localhost:3000/changePassword`
+* `https://localhost:3000/resetPassword`
 
 For more information on the server api, consult the [apiary.io documentation here](http://docs.userificserver.apiary.io/)
 

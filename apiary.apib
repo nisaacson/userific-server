@@ -19,7 +19,11 @@ When registering a user account, the following fields are required
 * `email`    - the email address used to login to the account
 * `password` - the password used to login to the account'
 
-If the `register` request completes correctly, a status code of `201` will be returned.
+If the `register` request completes correctly, a status code of `201` will be returned. The response will include the following fields
+
+* `_id` the id of the user record in the backend datastore
+* `email` the email address stored in the backend datastore. This should be the same as the input email
+* `confirmToken` the token stored in the backend datastore used to validate email confirmations.
 
 If the username or password is incorrect, a status code of `401` will be returned.
 
@@ -32,7 +36,7 @@ POST /register
 { "email":"foo@example.com", "password": "barPassword" }
 < 201
 < Content-Type: application/json
-{ "_id": "fooUserID", "email": "foo@example.com" }
+{ "_id": "fooUserID", "email": "foo@example.com", "confirmToken": "41a55f3f085b07271a33bf3dd30e079a" }
 +++++
 < 409
 < Content-Type: application/json; charset=utf-8
@@ -55,6 +59,15 @@ If the `authenticate` request completes correctly, a status code of `200` will b
 
 If the username or password is incorrect, a status code of `401` will be returned.
 
+If the username and password are correct but the user has not yet confirmed the email, a status code of `403` will be returned along with the body
+
+```javascript
+{
+    "message": "authenticate failed",
+    "reason": "unconfirmed"
+}
+```
+
 If either the username or password is missing, a status code of `409` will be returned.
 
 Finally if there is an error in the server or an error querying the database, a status cod of `500` will be returned
@@ -70,13 +83,17 @@ POST /authenticate
 < Content-Type: application/json; charset=utf-8
 {"code":"InvalidCredentials","message":"user not found"}
 +++++
-< 409
+< 403
 < Content-Type: application/json; charset=utf-8
-{"code": "MissingParameter", "message": "Authenticate failed", "errors": [ { "param": "email", "msg": "required" }]}
+{"code":"NotAuthorized","message":"authenticate failed", "reason": "unconfirmed" }
 +++++
 < 409
 < Content-Type: application/json; charset=utf-8
-{"code": "MissingParameter", "message": "Authenticate failed", "errors": [ { "param": "password", "msg": "required" }]}
+{"code": "MissingParameter", "message": "authenticate failed", "reason": "missing parameters", "errors": [ { "param": "email", "msg": "required" }]}
++++++
+< 409
+< Content-Type: application/json; charset=utf-8
+{"code": "MissingParameter", "message": "authenticate failed", "reason": "missing parameters", "errors": [ { "param": "password", "msg": "required" }]}
 
 
 

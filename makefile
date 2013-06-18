@@ -20,3 +20,7 @@ change-password-route:
 
 integration:
 	$(MOCHA) $(shell find test/integration/* -prune -name "*test.js") $(FLAGS)
+mongoose-backend:
+	$(MOCHA) test/integration/mongoose-backend-test.js $(FLAGS)
+postgres-backend:
+	$(MOCHA) test/integration/postgres-backend-test.js $(FLAGS)
