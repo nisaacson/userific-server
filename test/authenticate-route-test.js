@@ -57,6 +57,7 @@ describe('Authenticate Route', function() {
       status.should.eql(desiredStatusCode, 'incorrect status code')
       body.errors.length.should.eql(1)
       body.errors[0].param.should.eql('email')
+      body.reason.should.eql('missing_parameter')
       done()
     })
   });
@@ -71,6 +72,7 @@ it('authenticate post route should give MissingParameter error when password is 
       status.should.eql(desiredStatusCode, 'incorrect status code')
       body.errors.length.should.eql(1)
       body.errors[0].param.should.eql('password')
+      body.reason.should.eql('missing_parameter')
       done()
     })
   });

@@ -14,11 +14,12 @@ module.exports = function(backend) {
     if (errors) {
       var outputError = new restify.MissingParameterError("authenticate failed")
       outputError.body.errors = errors
+      outputError.body.reason = 'missing_parameter'
       return res.send(outputError)
     }
     backend.authenticate(params, function (err, user) {
       var outputError
-      inspect(err, 'authenticate error')
+
       if (err && err.reason === 'unconfirmed') {
         outputError = new restify.NotAuthorizedError('authenticate failed')
         outputError.body.reason = 'unconfirmed'

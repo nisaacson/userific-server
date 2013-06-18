@@ -6,6 +6,7 @@ var confirmEmail = require('./routes/confirmEmail')
 var changeEmail = require('./routes/changeEmail')
 var changePassword = require('./routes/changePassword')
 var resetPassword = require('./routes/resetPassword')
+var generatePasswordResetToken = require('./routes/generatePasswordResetToken')
 module.exports = function(backend, serverConfig) {
   var server = restify.createServer(serverConfig)
   server.get('ping', function(req, res) {
@@ -21,6 +22,7 @@ module.exports = function(backend, serverConfig) {
   server.post('/authenticate', authenticate(backend))
   server.post('/changeEmail', changeEmail(backend))
   server.post('/changePassword', changePassword(backend))
+  server.post('/generatePasswordResetToken', generatePasswordResetToken(backend))
   server.post('/resetPassword', resetPassword(backend))
   return server
 }
