@@ -55,9 +55,22 @@ When authenticating a user account, the following fields are required
 * `email`    - the email address used to login to the account
 * `password` - the password used to login to the account'
 
+## Valid Authorization
+
 If the `authenticate` request completes correctly, a status code of `200` will be returned.
 
-If the username or password is incorrect, a status code of `401` will be returned.
+## Invalid Username or Password
+If the username or password is incorrect, a status code of `401` will be returned along with the response body
+
+```javascript
+{
+    "message": "authenticate failed",
+    "reason": "invalid_credentials"
+}
+```
+
+
+## Unconfirmed
 
 If the username and password are correct but the user has not yet confirmed the email, a status code of `403` will be returned along with the body
 
@@ -68,7 +81,20 @@ If the username and password are correct but the user has not yet confirmed the 
 }
 ```
 
+## Missing Parameters
+
 If either the username or password is missing, a status code of `409` will be returned.
+
+```javascript
+{
+    "message": "authenticate failed",
+    "reason": "missing_paramters",
+    "errors": [
+      "param": "email", "msg": "required",
+      "param": "password", "msg": "required"
+    ]
+}
+```
 
 Finally if there is an error in the server or an error querying the database, a status cod of `500` will be returned
 
