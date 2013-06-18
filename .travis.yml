@@ -1,4 +1,7 @@
 language: node_js
+before_script:
+  - psql -c 'create database "userific-test";' -U postgres
+  - psql -d userific-test -f node_modules/userific-postgres/share/users.sql
 services:
     mongodb
 node_js:
