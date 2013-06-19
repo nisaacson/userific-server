@@ -12,12 +12,12 @@ module.exports = function(backend) {
     params = req.params
     errors = validateParameters(req)
     if (errors) {
-      outputError = new restify.MissingParameterError("generate password reset token failed")
+      outputError = new restify.MissingParameterError("generatePasswordResetToken failed")
       outputError.body.errors = errors
       outputError.body.reason = 'missing_parameter'
       return res.send(outputError)
     }
-    backend.generatePasswordResetToken(params, function(err, resetToken) {
+    backend.generatePasswordResetToken(params, function(err, user) {
       var output, outputError
       if (err) {
         var msg = err.message
@@ -25,14 +25,11 @@ module.exports = function(backend) {
         return next(outputError)
       }
       if (err && err.reason === 'unconfirmed') {
-        outputError = new restify.NotAuthorizedError('generate password reset token failed')
+        outputError = new restify.NotAuthorizedError('generatePasswordResetToken failed')
         outputError.body.reason = err.reason
         return res.send(outputError)
       }
-      output = {
-        resetToken: resetToken
-      }
-      res.send(200, output)
+      res.send(200, user)
     })
   }
 };

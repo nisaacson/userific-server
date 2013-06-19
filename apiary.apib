@@ -269,6 +269,65 @@ POST /changePassword
 {"code": "MissingParameter", "message": "changePassword failed", "errors": [ { "param": "currentPassword", "msg": "required" }, { "param": "newPassword", "msg": "required" }, { "param": "email", "msg": "required" }]}
 
 
+Generate a password reset token for a given account. When a user forgets their login password and needs to reset the password to a new one, the system must first confirm the user another way. One possibility is via their email address. the `/generatePasswordResetToken` api endpoint allows a user to begin the reset process. The backend will generate a reset token and associate it with the user in the database. Since the userific server is intended to be used as a public api, the reset token is not returned back in the response body. To email the reset token to the user, your web server must query the database itself a fetch the reset token.
+
+When generating a password reset token, the following fields are required
+
+* `email`           - the email address used to login to the account
+
+## Success
+
+If the `generatePasswordResetToken` request completes correctly, a status code of `200` will be returned. You can then fetch the reset token from the data-store and email it to the user. The response will include the following fields
+
+```javascript
+{
+  "_id": "fooUserID",
+  "email": "foo@example.com"
+}
+```
+
+## Missing Parameters
+
+If any of the required fields are either missing or invalid, a status code of `409` will be returned. The response will include the following fields
+
+```javascript
+{
+ "code": "MissingParameter",
+ "message": "generatePasswordResetToken failed",
+ "reason": "missing_parameter",
+ "errors": [
+   { "param": "email", "msg": "required" }
+ ]
+}
+```
+
+## Unconfirmed User
+
+If the endpoint is called with an email address for a user who has registered but not yet confirmed their email, a status code of `403` will be returned. The response body will include the following fields:
+
+```javascript
+{
+ "code": "NotAuthorized",
+ "message": "generatePasswordResetTokenFailed",
+ "reason": "unconfirmed"
+}
+```
+
+POST /generatePasswordResetToken
+> Content-Type: application/json
+{ "email":"foo@example.com" }
+< 200
+< Content-Type: application/json
+{ "_id": "fooUserID", "email": "foo@example.com" }
++++++
+< 403
+< Content-Type: application/json; charset=utf-8
+{"code":"Not Authorized","message":"generatePasswordResetTokenFailed", "reason": "unconfirmed" }
++++++
+< 409
+< Content-Type: application/json; charset=utf-8
+{"code": "MissingParameter", "message": "generatePasswordResetTokenFailed", "errors": [ { "param": "email", "msg": "required" } ] }
+
 Ping the server to make sure it online
 GET /ping
 < 200
