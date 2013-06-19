@@ -12,8 +12,8 @@ var should = require('should')
 var userificServer = require('../../')
 var request = require('request')
 describe('PostGRE backend routes', function() {
+  this.timeout('10s')
   var baseURL, port, server, user, client, registerOpts
-    this.timeout('50s')
     user = {
       username: 'fooUsername',
       email: 'foo@example.com',
@@ -30,9 +30,19 @@ describe('PostGRE backend routes', function() {
   }
   before(function(done) {
     var backend, serverConfig
-      backend = new UserificPostGRES(postgresConfig)
-      serverConfig = {}
-    server = userificServer(backend, serverConfig)
+    var registerCallback = function(req, res, user) {
+      user.fakeConfirmToken = user.confirmToken;
+      delete user.confirmToken
+      res.send(201, user)
+    }
+    var generatePasswordResetTokenCallback = function(req, res, user) {
+      user.fakeResetToken = user.resetToken;
+      delete user.resetToken
+      res.send(200, user)
+    }
+    backend = new UserificPostGRES(postgresConfig)
+    serverConfig = {}
+    server = userificServer(backend, serverConfig, registerCallback, generatePasswordResetTokenCallback)
     should.exist(server, 'server object not returned')
     server.listen(0)
     server.on('listening', function() {
@@ -71,7 +81,7 @@ describe('PostGRE backend routes', function() {
       var status = res.statusCode
       status.should.eql(201, 'incorrect status code')
       body.email.should.eql(user.email)
-      var confirmToken = body.confirmToken
+      var confirmToken = body.fakeConfirmToken
       should.exist(confirmToken, 'confirmToken not set in register response body')
       var confirmOpts = {
         url: baseURL + '/confirmEmail',
@@ -97,7 +107,7 @@ describe('PostGRE backend routes', function() {
       var status = res.statusCode
       status.should.eql(201, 'incorrect status code')
       body.email.should.eql(user.email)
-      var confirmToken = body.confirmToken
+      var confirmToken = body.fakeConfirmToken
       should.exist(confirmToken, 'confirmToken not set in register response body')
       var confirmOpts = {
         url: baseURL + '/confirmEmail',
@@ -155,7 +165,7 @@ describe('PostGRE backend routes', function() {
       var status = res.statusCode
       status.should.eql(201, 'incorrect status code')
       body.email.should.eql(user.email)
-      var confirmToken = body.confirmToken
+      var confirmToken = body.fakeConfirmToken
       should.exist(confirmToken, 'confirmToken not set in register response body')
       var authenticateOpts = {
         url: baseURL + '/authenticate',
@@ -182,7 +192,7 @@ describe('PostGRE backend routes', function() {
       var status = res.statusCode
       status.should.eql(201, 'incorrect status code')
       body.email.should.eql(user.email)
-      var confirmToken = body.confirmToken
+      var confirmToken = body.fakeConfirmToken
       should.exist(confirmToken, 'confirmToken not set in register response body')
       var confirmOpts = {
         url: baseURL + '/confirmEmail',
@@ -225,7 +235,7 @@ describe('PostGRE backend routes', function() {
       var status = res.statusCode
       status.should.eql(201, 'incorrect status code')
       body.email.should.eql(user.email)
-      var confirmToken = body.confirmToken
+      var confirmToken = body.fakeConfirmToken
       should.exist(confirmToken, 'confirmToken not set in register response body')
       var confirmOpts = {
         url: baseURL + '/confirmEmail',
@@ -253,7 +263,7 @@ describe('PostGRE backend routes', function() {
         request(generatePasswordResetTokenOpts, function(err, res, body) {
           should.not.exist(err, 'error posting to generatePasswordResetToken route')
           res.statusCode.should.eql(200)
-          should.exist(body.resetToken, 'resetToken field missing from body')
+          should.exist(body.fakeResetToken, 'fakeResetToken field missing from body')
           done()
         })
       })
@@ -266,8 +276,8 @@ describe('PostGRE backend routes', function() {
       var status = res.statusCode
       status.should.eql(201, 'incorrect status code')
       body.email.should.eql(user.email)
-      var confirmToken = body.confirmToken
-      should.exist(confirmToken, 'confirmToken not set in register response body')
+      var confirmToken = body.fakeConfirmToken
+      should.exist(confirmToken, 'fakeConfirmToken not set in register response body')
       var confirmOpts = {
         url: baseURL + '/confirmEmail',
         method: 'post',
@@ -293,8 +303,8 @@ describe('PostGRE backend routes', function() {
         request(generatePasswordResetTokenOpts, function(err, res, body) {
           should.not.exist(err, 'error posting to generatePasswordResetToken route')
           res.statusCode.should.eql(200)
-          should.exist(body.resetToken, 'resetToken field missing from body')
-          var resetToken = body.resetToken
+          should.exist(body.fakeResetToken, 'fakeResetToken field missing from body')
+          var resetToken = body.fakeResetToken
           var resetPasswordOpts = {
             url: baseURL + '/resetPassword',
             method: 'post',
@@ -334,10 +344,10 @@ describe('PostGRE backend routes', function() {
     request(registerOpts, function(err, res, body) {
       should.not.exist(err, 'error posting to register route')
       var status = res.statusCode
-      status.should.eql(201, 'incorrect status code')
+      status.should.eql(201, 'incorrect status code after registering')
       body.email.should.eql(user.email)
-      var confirmToken = body.confirmToken
-      should.exist(confirmToken, 'confirmToken not set in register response body')
+      var confirmToken = body.fakeConfirmToken
+      should.exist(confirmToken, 'fakeConfirmToken not set in register response body')
       var confirmOpts = {
         url: baseURL + '/confirmEmail',
         method: 'post',
