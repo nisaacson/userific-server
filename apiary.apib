@@ -19,17 +19,44 @@ When registering a user account, the following fields are required
 * `email`    - the email address used to login to the account
 * `password` - the password used to login to the account'
 
+
+## Valid Registration
+
 If the `register` request completes correctly, a status code of `201` will be returned. The response will include the following fields
 
-* `_id` the id of the user record in the backend datastore
-* `email` the email address stored in the backend datastore. This should be the same as the input email
-* `confirmToken` the token stored in the backend datastore used to validate email confirmations.
+```
+{
+  "_id": "the id of the user record in the backend datastore"
+ "email": "the email address stored in the backend datastore. This should be the same as the input email"
+ "confirmToken": "the token stored in the backend datastore used to validate email confirmations"
+}
+```
 
-If the username or password is incorrect, a status code of `401` will be returned.
+## Invalid
+If either the username or password is missing or invalid, a status code of `409` will be returned. The response will include the following fields
 
-If either the username or password is missing, a status code of `409` will be returned.
+```javascript
+{
+  "code": "MissingParameter",
+  "messge": "register failed",
+  "reason": "missing_parameters",
+  "errors": [
+    { "param": "password", "msg": "password must be at least 4 characters long", "value": "foo" },
+    { "param": "email", "msg": "required", "value": "foo.com" } // email address is not a valid address
+  ]
+}
+```
 
-Finally if there is an error in the server or an error querying the database, a status cod of `500` will be returned
+## Internal Errors
+
+If there is an error in the server or an error querying the database, a status cod of `500` will be returned. The response will include the following fields
+
+```javascript
+{
+  "code": "InternalError",
+  "messge": "register failed",
+}
+```
 
 POST /register
 > Content-Type: application/json
@@ -130,7 +157,38 @@ When changing email, the following fields are required
 * `password`     - the password used to login to the account
 * `newEmail`     - the new email address of the account
 
+
+## Success
+
 If the `changeEmail` request completes correctly, a status code of `200` will be returned. You can the call the authenticate route using the new email address and password to login
+
+
+## Missing Parameter
+
+If one or more of the posted parameters is either missing or incorrect, a status code of `409` will be returned. The response will include the following fields
+
+```javascript
+{
+  "code": "MissingParameter",
+  "message": "changeEmail failed",
+  "errors": [
+    { "param": "currentEmail", "msg": "required" },
+    { "param": "newEmail", "msg": "required" },
+    { "param": "password", "msg": "required" }
+  ]
+}
+```
+
+## Invalid Password
+
+If the supplied password is not correct for the supplied `currentEmail` parameter, a status code of `401` will be returned. The response will include the following fields
+
+```javascript
+{
+  "code":"InvalidCredentials",
+  "message":"user not found"
+}
+```
 
 POST /changeEmail
 > Content-Type: application/json
@@ -156,7 +214,45 @@ When changing password, the following fields are required
 * `email`           - the email address used to login to the account
 * `newpassword`     - the new password of the account
 
-If the `changePassword` request completes correctly, a status code of `200` will be returned. You can the call the authenticate route using the email address and new password to login
+
+## Success
+
+If the `changePassword` request completes correctly, a status code of `200` will be returned. You can then call the authenticate route using the email address and new password to login. On succesful change password requests, the response will include the following fields
+
+```javascript
+{
+  "_id": "fooUserID",
+  "email": "foo@example.com"
+}
+```
+
+## Invalid Password
+
+If the supplied `currentPassword` is not correct for the supplied `email` parameter, a status code of `401` will be returned. The response will include the following fields
+
+```javascript
+{
+  "code":"InvalidCredentials",
+  "message":"user not found"
+}
+```
+
+## Missing Parameters
+
+If any of the required fields are either missing or invalid, a status code of `409` will be returned. The response will include the following fields
+
+```javascript
+{
+ "code": "MissingParameter",
+ "message": "changePassword failed",
+ "errors": [
+   { "param": "currentPassword", "msg": "required" },
+   { "param": "newPassword", "msg": "required" },
+   { "param": "email", "msg": "required" }
+ ]
+}
+```
+
 POST /changePassword
 > Content-Type: application/json
 { "email":"foo@example.com", "currentPassword": "fooPassword", "newPassword": "newBarPassword2" }
