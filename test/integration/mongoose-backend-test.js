@@ -33,10 +33,21 @@ describe('Mongoose backend routes', function() {
 
   before(function(done) {
     var backend, serverConfig;
+        var registerCallback = function(req, res, user) {
+      user.fakeConfirmToken = user.confirmToken;
+      delete user.confirmToken
+      res.send(201, user)
+    }
+    var generatePasswordResetTokenCallback = function(req, res, user) {
+      user.fakeResetToken = user.resetToken;
+      delete user.resetToken
+      res.send(200, user)
+    }
+
     backend = new UserificMongoose(mongo)
     User = backend.User
     serverConfig = {}
-    server = userificServer(backend, serverConfig)
+    server = userificServer(backend, serverConfig, registerCallback, generatePasswordResetTokenCallback)
     should.exist(server, 'server object not returned')
     server.listen(0)
     server.on('listening', function() {
