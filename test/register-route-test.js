@@ -1,3 +1,4 @@
+var inspect = require('eyespect').inspector()
 var restify = require('restify')
 var ce = require('cloneextend')
 var should = require('should')
@@ -9,7 +10,8 @@ describe('Register Route', function() {
     username: 'fooUsername',
     email: 'foo@example.com',
     password: 'fooPassword',
-    _id: 'fooUserID'
+    _id: 'fooUserID',
+    confirmToken: 'fooConfirmToken'
   }
   var backend = {
     register: function(data, cb) {
@@ -26,9 +28,17 @@ describe('Register Route', function() {
       password: user.password
     }
   }
+  var registerCallback
   before(function(done) {
     var serverConfig = {}
-    server = userificServer(backend, serverConfig)
+    registerCallback = function(req, res, user) {
+      delete user.confirmToken
+      res.send(201, user)
+    }
+    var generatePasswordResetTokenCallback = function(req, res, user) {
+      console.log('mock generatePasswordResetTokenCallback called')
+    }
+    server = userificServer(backend, serverConfig, registerCallback, generatePasswordResetTokenCallback)
     should.exist(server, 'server object not returned')
     server.listen(0)
     server.on('listening', function() {
@@ -43,6 +53,7 @@ describe('Register Route', function() {
       should.not.exist(err, 'error posting to register route')
       var status = res.statusCode
       status.should.eql(201, 'incorrect status code')
+      should.not.exist(body.confirmToken)
       body.username.should.eql(user.username)
       done()
     })
@@ -61,7 +72,7 @@ describe('Register Route', function() {
     })
   });
 
-it('register post route should give MissingParameter error when password is not supplied', function(done) {
+  it('register post route should give MissingParameter error when password is not supplied', function(done) {
     var testOpts = ce.clone(opts);
     delete testOpts.form.password
     request(testOpts, function(err, res, body) {

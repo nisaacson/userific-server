@@ -32,7 +32,13 @@ describe('Change Email Route', function() {
   }
   before(function(done) {
     var serverConfig = {}
-    server = userificServer(backend, serverConfig)
+    var registerCallback = function(req, res, user) {
+      console.log('mock register callback called')
+    }
+    var generatePasswordResetTokenCallback = function(req, res, user) {
+      console.log('mock generatePasswordResetTokenCallback called')
+    }
+    server = userificServer(backend, serverConfig, registerCallback, generatePasswordResetTokenCallback)
     should.exist(server, 'server object not returned')
     server.listen(0)
     server.on('listening', function() {
@@ -65,7 +71,7 @@ describe('Change Email Route', function() {
     })
   });
 
-it('changeEmail post route should give MissingParameter error when newEmail is not supplied', function(done) {
+  it('changeEmail post route should give MissingParameter error when newEmail is not supplied', function(done) {
     var testOpts = ce.clone(opts);
     delete testOpts.form.newEmail
     request(testOpts, function(err, res, body) {

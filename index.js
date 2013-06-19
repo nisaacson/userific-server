@@ -1,3 +1,4 @@
+var should = require('should')
 var restify = require('restify')
 var restifyValidator = require('restify-validator')
 var register = require('./routes/register')
@@ -14,6 +15,13 @@ module.exports = function(backend, serverConfig, registerCallback, generatePassw
       message: 'pong'
     })
   })
+
+  // validate parameters
+  should.exist(serverConfig, 'you must supply a serverConfig object as the second')
+  should.exist(registerCallback, 'you must supply a callback for the register function as the third parameter')
+  should.exist(generatePasswordResetTokenCallback, 'you must supply a callback for the generatePasswordResetToken function as the fourth parameter')
+
+
   server.use(restify.bodyParser())
   server.use(restify.queryParser())
   server.use(restifyValidator)
