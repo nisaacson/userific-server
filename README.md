@@ -13,6 +13,15 @@ npm install -S userific-server
 To setup the server you need to supply a properly configured userific backend. When creating the server you need to supply your own callbacks to the `register` and `generatePasswordResetToken`. Both of these functions generate secret tokens which are used to confirm the user by their email address. The userific api server is intended to be a public-facing api so the tokens cannot be passed back directly to the user. Each callback will be passed the `req` (request),`res` (response) and the data provided by the backend after the work is complete
 
 ```javascript
+var restify = require('restify')
+var nodemailer = require("nodemailer");
+var smtpTransport = nodemailer.createTransport("SMTP",{
+    service: "Gmail",
+    auth: {
+        user: "gmail.user@gmail.com",
+        pass: "userpass"
+    }
+});
 var userificServer = require('userific-server')
 var mongooseBackend = require('userific-mongoose')
 var config = {
@@ -44,16 +53,24 @@ var registerCallback = function(req, res, user) {
   var confirmEmailLink = 'http://localhost:3000/confirmEmail?confirmToken=' + confirmToken
   var emailBody = 'Thanks for registering a new account. Please click on the link below to confirm your email address and finish the registration process\n' + confirmEmailLink
   // send email here
-  mailer.send(email, emailBody, function(err) {
+  var mailOptions = {
+    from: "Fred Foo ✔ <info@example.com>", // sender address
+    to: email, // list of receivers
+    subject: "Hello ✔", // Subject line
+    text: emailBody, // plaintext body
+    html: "<b>Hello world ✔</b>" // html body
+  }
+
+  // send mail with defined transport object
+  smtpTransport.sendMail(mailOptions, function(err, response){
     var outputError
     if (err) {
-      outputError = new restify.InternalError('register completed correctly but failed to send)
+      outputError = new restify.InternalError('register completed correctly but failed to send')
       outputError.body.error = err
       outputError.body.reason = 'send_email_failed'
       res.send(outputError)
       return
     }
-
     // never send the confirmToken directly to the user
     delete user.confirmToken
     res.send(user)
@@ -79,10 +96,19 @@ var generatePasswordResetTokenCallback = function(req, res, user) {
   var resetLink = 'http://localhost:3000/resetPassword?resetToken=' + resetToken
   var emailBody = 'You have requested to reset your password. Please click on the link below to reset your password\n' + resetLink
   // send email here
-  mailer.send(email, emailBody, function(err) {
+  var mailOptions = {
+    from: 'Fred Foo <info@example.com>', // sender address
+    to: email, // list of receivers
+    subject: 'Hello', // Subject line
+    text: emailBody, // plaintext body
+    html: '<b>Hello world</b>' // html body
+  }
+
+  // send mail with defined transport object
+  smtpTransport.sendMail(mailOptions, function(err, response){
     var outputError
     if (err) {
-      outputError = new restify.InternalError('generatePasswordResetToken completed correctly but failed to send email to user with reset link)
+      outputError = new restify.InternalError('generatePasswordResetToken completed correctly but failed to send email to user with reset link')
       outputError.body.error = err
       outputError.body.reason = 'send_email_failed'
       res.send(outputError)
@@ -126,7 +152,12 @@ For example say the server is listening on `host: localhost`, `port: 3000` and i
 * `https://localhost:3000/authenticate`
 * `https://localhost:3000/changeEmail`
 * `https://localhost:3000/changePassword`
+* `https://localhost:3000/generatePasswordResetToken`
 * `https://localhost:3000/resetPassword`
 
 For more information on the server api, consult the [apiary.io documentation here](http://docs.userificserver.apiary.io/)
+
+# Example
+
+An example of how you might create your own userific server is included. Open the `./examples/` folder for more information
 

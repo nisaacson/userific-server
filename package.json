@@ -41,7 +41,8 @@
     "mongoose": "~3.6.11",
     "nconf": "~0.6.7",
     "userific-test": "0.0.12",
-    "userific-postgres": "~0.1.0"
+    "userific-postgres": "~0.1.0",
+    "optimist": "~0.5.2"
   },
   "gitHead": "7a3b9dcb806745102c64e736c2b2149191078f79",
   "bugs": {
