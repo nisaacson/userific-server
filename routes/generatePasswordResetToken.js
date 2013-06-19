@@ -1,12 +1,11 @@
-/**
- * resetPassword route for an existing user. This route should be called via POST request
- * @param  {Request}   req the request object. Note that all user data is
- *   contained in the req.params object.
- * @param  {Response}   res the response object to send data back to the client
- * @param  {Function} next the restify handler to pass control to the next middleware in line
+ /**
+ * generatePasswordResetToken closure
+ * @param  {Object} backend   a userfic backend that implements the interface defined in the Userific module
+ * @param  {Function} cb      a user-specified callback function that can be used to send the user an email with the reset token
+ * @return {[type]}           [description]
  */
 var restify = require('restify')
-module.exports = function(backend) {
+module.exports = function(backend, cb) {
   return function(req, res, next) {
     var outputError, params, errors
     params = req.params
@@ -29,7 +28,7 @@ module.exports = function(backend) {
         outputError.body.reason = err.reason
         return res.send(outputError)
       }
-      res.send(200, user)
+      cb(req, res, user)
     })
   }
 };

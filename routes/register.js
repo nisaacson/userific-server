@@ -6,7 +6,7 @@ var restify = require('restify')
  * @param  {Response}   res the response object to send data back to the client
  * @param  {Function} next the restify handler to pass control to the next middleware in line
  */
-module.exports = function(backend) {
+module.exports = function(backend, cb) {
   return function(req, res, next) {
     var params = req.params
     var errors = validateParameters(req)
@@ -21,7 +21,7 @@ module.exports = function(backend) {
         var outputError = new restify.InternalError(msg)
         return next(outputError)
       }
-      res.send(201, user)
+      cb(req, res, user)
     })
 
   }
