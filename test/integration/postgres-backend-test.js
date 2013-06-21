@@ -5,6 +5,7 @@ var config = require('nconf').file({
   file: configFilePath
 })
 var postgresConfig = config.get('postgres')
+var table = postgresConfig.table
 var UserificPostGRES = require('userific-postgres')
 var restify = require('restify')
 var ce = require('cloneextend')
@@ -66,80 +67,40 @@ describe('PostGRE backend routes', function() {
   })
 
   it('register post route should be supported', function(done) {
-    request(registerOpts, function(err, res, body) {
-      should.not.exist(err, 'error posting to register route')
-      var status = res.statusCode
-      status.should.eql(201, 'incorrect status code')
-      body.email.should.eql(user.email)
-      done()
-    })
-  });
+    testRegister(baseURL, user, done)
+  })
 
-  it('confirmEmail post route should be supported', function(done) {
-    request(registerOpts, function(err, res, body) {
-      should.not.exist(err, 'error posting to register route')
-      var status = res.statusCode
-      status.should.eql(201, 'incorrect status code')
-      body.email.should.eql(user.email)
-      var confirmToken = body.fakeConfirmToken
-      should.exist(confirmToken, 'confirmToken not set in register response body')
-      var confirmOpts = {
-        url: baseURL + '/confirmEmail',
-        method: 'post',
-        form: {
-          confirmToken: confirmToken
-        },
-        json: true
-      }
-      request(confirmOpts, function(err, res, body) {
-        should.not.exist(err)
-        should.exist(body)
-        body.confirmed.should.eql(true, 'confirmed should be true')
-        res.statusCode.should.eql(200)
-        done()
+  it('confirmEmail get route should be supported', function(done) {
+    testRegister(baseURL, user, function(err, body) {
+      getConfirmTokenForEmail(client, user.email, function(err, confirmToken) {
+        testConfirmUser(baseURL, confirmToken, done)
       })
     })
-  });
+  })
 
   it('authenticate post route should be supported', function(done) {
-    request(registerOpts, function(err, res, body) {
-      should.not.exist(err, 'error posting to register route')
-      var status = res.statusCode
-      status.should.eql(201, 'incorrect status code')
-      body.email.should.eql(user.email)
-      var confirmToken = body.fakeConfirmToken
-      should.exist(confirmToken, 'confirmToken not set in register response body')
-      var confirmOpts = {
-        url: baseURL + '/confirmEmail',
-        method: 'post',
-        form: {
-          confirmToken: confirmToken
-        },
-        json: true
-      }
-      request(confirmOpts, function(err, res, body) {
-        should.not.exist(err)
-        should.exist(body)
-        body.confirmed.should.eql(true, 'confirmed should be true')
-        res.statusCode.should.eql(200)
-        var authenticateOpts = {
-          url: baseURL + '/authenticate',
-          method: 'post',
-          form: {
-            email: user.email,
-            password: user.password
-          },
-          json: true
-        }
-        request(authenticateOpts, function(err, res, body) {
-          should.not.exist(err, 'error posting to authenticate route')
-          res.statusCode.should.eql(200)
-          body.email.should.eql(authenticateOpts.form.email)
-          done()
+    testRegister(baseURL, user, function(err, body) {
+      getConfirmTokenForEmail(client, user.email, function(err, confirmToken) {
+        testConfirmUser(baseURL, confirmToken, function(err, body) {
+          var authenticateOpts = {
+            url: baseURL + '/authenticate',
+            method: 'post',
+            form: {
+              email: user.email,
+              password: user.password
+            },
+            json: true
+          }
+          request(authenticateOpts, function(err, res, body) {
+            should.not.exist(err, 'error posting to authenticate route')
+            res.statusCode.should.eql(200, 'incorrect status code when authenticating valid user')
+            body.email.should.eql(authenticateOpts.form.email)
+            done()
+          })
         })
       })
     })
-  });
+  })
 
   it('authenticate post route should return 401 status code when user is not found', function(done) {
     var authenticateOpts = {
@@ -160,11 +121,7 @@ describe('PostGRE backend routes', function() {
   });
 
   it('authenticate post route should return 403 status code when user is found but not confirmed', function(done) {
-    request(registerOpts, function(err, res, body) {
-      should.not.exist(err, 'error posting to register route')
-      var status = res.statusCode
-      status.should.eql(201, 'incorrect status code')
-      body.email.should.eql(user.email)
+    testRegister(baseURL, user, function(err, body) {
       var confirmToken = body.fakeConfirmToken
       should.exist(confirmToken, 'confirmToken not set in register response body')
       var authenticateOpts = {
@@ -187,84 +144,51 @@ describe('PostGRE backend routes', function() {
   })
 
   it('changeEmail post route should be supported', function(done) {
-    request(registerOpts, function(err, res, body) {
-      should.not.exist(err, 'error posting to register route')
-      var status = res.statusCode
-      status.should.eql(201, 'incorrect status code')
-      body.email.should.eql(user.email)
-      var confirmToken = body.fakeConfirmToken
-      should.exist(confirmToken, 'confirmToken not set in register response body')
-      var confirmOpts = {
-        url: baseURL + '/confirmEmail',
-        method: 'post',
-        form: {
-          confirmToken: confirmToken
-        },
-        json: true
-      }
-      request(confirmOpts, function(err, res, body) {
-        should.not.exist(err)
-        should.exist(body)
-        body.confirmed.should.eql(true, 'confirmed should be true')
-        res.statusCode.should.eql(200)
-        var newEmail = 'newEmail2@example.com'
-        var changeEmailOpts = {
-          url: baseURL + '/changeEmail',
-          method: 'post',
-          form: {
-            currentEmail: user.email,
-            newEmail: newEmail,
-            password: user.password
-          },
-          json: true
-        }
+    testRegister(baseURL, user, function(err, body) {
+      getConfirmTokenForEmail(client, user.email, function(err, confirmToken) {
+        testConfirmUser(baseURL, confirmToken, function(err, body) {
+          var newEmail = 'newEmail2@example.com'
+          var changeEmailOpts = {
+            url: baseURL + '/changeEmail',
+            method: 'post',
+            form: {
+              currentEmail: user.email,
+              newEmail: newEmail,
+              password: user.password
+            },
+            json: true
+          }
 
-        request(changeEmailOpts, function(err, res, body) {
-          should.not.exist(err, 'error posting to authenticate route')
-          res.statusCode.should.eql(200)
-          body.email.should.eql(changeEmailOpts.form.newEmail)
-          done()
+          request(changeEmailOpts, function(err, res, body) {
+            should.not.exist(err, 'error posting to authenticate route')
+            res.statusCode.should.eql(200)
+            body.email.should.eql(changeEmailOpts.form.newEmail)
+            done()
+          })
         })
       })
     })
   })
 
-  it('generatePasswordResetToken post route should be supported', function(done) {
-    request(registerOpts, function(err, res, body) {
-      should.not.exist(err, 'error posting to register route')
-      var status = res.statusCode
-      status.should.eql(201, 'incorrect status code')
-      body.email.should.eql(user.email)
-      var confirmToken = body.fakeConfirmToken
-      should.exist(confirmToken, 'confirmToken not set in register response body')
-      var confirmOpts = {
-        url: baseURL + '/confirmEmail',
-        method: 'post',
-        form: {
-          confirmToken: confirmToken
-        },
-        json: true
-      }
-      request(confirmOpts, function(err, res, body) {
-        should.not.exist(err)
-        should.exist(body)
-        body.confirmed.should.eql(true, 'confirmed should be true')
-        res.statusCode.should.eql(200)
-        var newEmail = 'newEmail2@example.com'
-        var generatePasswordResetTokenOpts = {
-          url: baseURL + '/generatePasswordResetToken',
-          method: 'post',
-          form: {
-            email: user.email
-          },
-          json: true
-        }
-
-        request(generatePasswordResetTokenOpts, function(err, res, body) {
-          should.not.exist(err, 'error posting to generatePasswordResetToken route')
-          res.statusCode.should.eql(200)
-          should.exist(body.fakeResetToken, 'fakeResetToken field missing from body')
-          done()
+  it.only('generatePasswordResetToken post route should be supported', function(done) {
+    testRegister(baseURL, user, function(err, body) {
+      getConfirmTokenForEmail(client, user.email, function(err, confirmToken) {
+        testConfirmUser(baseURL, confirmToken, function(err, body) {
+          var newEmail = 'newEmail2@example.com'
+          var generatePasswordResetTokenOpts = {
+            url: baseURL + '/generatePasswordResetToken',
+            method: 'post',
+            form: {
+              email: user.email
+            },
+            json: true
+          }
+          request(generatePasswordResetTokenOpts, function(err, res, body) {
+            should.not.exist(err, 'error posting to generatePasswordResetToken route')
+            res.statusCode.should.eql(200)
+            should.exist(body.fakeResetToken, 'fakeResetToken field missing from body')
+            done()
+          })
         })
       })
     })
@@ -395,3 +319,51 @@ describe('PostGRE backend routes', function() {
     })
   })
 })
+
+
+
+  function getConfirmTokenForEmail(client, email, cb) {
+    var query = 'SELECT confirm_token from ' + table + ' where email = $1'
+    client.query(query, [email], function(err, reply) {
+      should.not.exist(err, 'error getting confirm code')
+      var rows = reply.rows
+      rows.length.should.eql(1)
+      var record = rows[0]
+      var confirmToken = record.confirm_token
+      should.exist(confirmToken, 'confirmToken not found')
+      return cb(null, confirmToken)
+    })
+  }
+
+  function testRegister(baseURL, user, cb) {
+    var opts = {
+      url: baseURL + '/register',
+      method: 'post',
+      form: {
+        email: user.email,
+        password: user.password
+      },
+      json: true
+    }
+    request(opts, function(err, res, body) {
+      should.not.exist(err, 'error registering user')
+      res.statusCode.should.eql(201, 'wrong status code after registering user')
+      body.email.should.eql(user.email, 'incorrect email in register body')
+      cb(null, body)
+    })
+  }
+
+
+  function testConfirmUser(baseURL, confirmToken, cb) {
+    var opts = {
+      url: baseURL + '/confirmEmail?confirmToken=' + confirmToken,
+      method: 'get',
+      json: true
+    }
+    request(opts, function(err, res, body) {
+      should.not.exist(err, 'error confirming email')
+      body.confirmed.should.eql(true, 'body.confirmed should be true')
+      res.statusCode.should.eql(200, 'wrong status code after registering user')
+      cb(null, body)
+    })
+  }
