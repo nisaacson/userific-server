@@ -45,23 +45,19 @@ If the `register` request completes correctly, a status code of `201` will be re
 ## Invalid
 If either the email or password is missing or invalid, a status code of `409` will be returned. The response will include the following fields
 
-```javascript
-{
-  "code": "MissingParameter",
-  "messge": "register failed",
-  "reason": "missing_parameters",
-  "errors": [
+* `"code": "MissingParameter"`
+* `"message": "register failed"`
+* `"reason"`: "missing_parameters"`
+* `"errors": [
     { "param": "password", "msg": "password must be at least 4 characters long", "value": "foo" },
     { "param": "email", "msg": "required", "value": "foo.com" } // email address is not a valid address
-  ]
-}
-```
+  ]`
 
 ## Email Taken
 If the supplied email is already registered to another account, a statusCode of `409` will be returned. The response will include the following fields
 
   * `"code": "InvalidArgument"`
-  * `"message": "register failed"
+  * `"message": "register failed"`
   * `"reason"`: `"email_taken"`
 
 
