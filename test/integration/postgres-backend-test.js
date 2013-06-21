@@ -231,7 +231,6 @@ describe('PostGRE backend routes', function() {
     })
   })
 
-
   it('changePassword post route should be supported', function(done) {
     testRegister(baseURL, user, function(err, body) {
       getConfirmTokenForEmail(client, user.email, function(err, confirmToken) {

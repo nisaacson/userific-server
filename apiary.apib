@@ -461,7 +461,7 @@ If the endpoint is called with a `resetToken` that does not exist in the databas
 
 ```javascript
 {
- "code": "NotAuthorized",
+ "code": "InvalidCredentials",
  "message": "resetToken",
  "reason": "invalid_token"
 }
@@ -476,7 +476,7 @@ POST /resetPassword
 +++++
 < 403
 < Content-Type: application/json; charset=utf-8
-{"code":"Forbidden","message":"resetPassword failed", "reason": "unconfirmed" }
+{"code":"NotAuthorized","message":"resetPassword failed", "reason": "unconfirmed" }
 +++++
 < 409
 < Content-Type: application/json; charset=utf-8
