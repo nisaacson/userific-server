@@ -69,6 +69,26 @@ describe('PostGRE backend routes', function() {
   it('register post route should be supported', function(done) {
     testRegister(baseURL, user, done)
   })
+  it.only('register post route should be give error when registering duplicate email', function(done) {
+    testRegister(baseURL, user, function(err, body) {
+      var opts = {
+        url: baseURL + '/register',
+        method: 'post',
+        form: {
+          email: user.email,
+          password: user.password
+        },
+        json: true
+      }
+      request(opts, function(err, res, body) {
+        should.not.exist(err, 'error registering user')
+        body.reason.should.eql('email_taken')
+        res.statusCode.should.eql(409)
+        body.code.should.eql('InvalidArgument')
+        done()
+      })
+    })
+  })
 
   it('confirmEmail get route should be supported', function(done) {
     testRegister(baseURL, user, function(err, body) {
