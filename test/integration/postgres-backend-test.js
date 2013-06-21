@@ -311,8 +311,11 @@ function testAuthenticate(baseURL, user, cb) {
 
 function testConfirmUser(baseURL, confirmToken, cb) {
   var opts = {
-    url: baseURL + '/confirmEmail?confirmToken=' + confirmToken,
-    method: 'get',
+    url: baseURL + '/confirmEmail',
+    method: 'post',
+    form: {
+      confirmToken: confirmToken
+    },
     json: true
   }
   request(opts, function(err, res, body) {

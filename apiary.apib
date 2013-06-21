@@ -138,8 +138,9 @@ If there is an error in the server or an error querying the database, a status c
 }
 ```
 
-GET /confirmEmail?confirmToken=asdf34vfdsfsdaoj29dkscnasd02ondwfoij
+POST /confirmEmail
 > Content-Type: application/json
+> { "confirmToken": "asdf34vfdsfsdaoj29dkscnasd02ondwfoij" }
 < 200
 < Content-Type: application/json
 { "_id": "fooUserID", "email": "foo@example.com" }
