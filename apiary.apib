@@ -34,13 +34,9 @@ When registering a user account, the following fields are required
 
 If the `register` request completes correctly, a status code of `201` will be returned. The response will include the following fields
 
-```
-{
-  "_id": "the id of the user record in the backend datastore"
- "email": "the email address stored in the backend datastore. This should be the same as the input email"
- "confirmToken": "the token stored in the backend datastore used to validate email confirmations"
-}
-```
+* `"_id": "the id of the user record in the backend datastore"`
+* `"email": "the email address stored in the backend datastore. This should be the same as the input email"`
+
 
 ## Invalid
 If either the email or password is missing or invalid, a status code of `409` will be returned. The response will include the following fields
@@ -48,10 +44,7 @@ If either the email or password is missing or invalid, a status code of `409` wi
 * `"code": "MissingParameter"`
 * `"message": "register failed"`
 * `"reason"`: "missing_parameters"`
-* `"errors": [
-    { "param": "password", "msg": "password must be at least 4 characters long", "value": "foo" },
-    { "param": "email", "msg": "required", "value": "foo.com" } // email address is not a valid address
-  ]`
+* `"errors": [ { "param": "password", "msg": "password must be at least 4 characters long", "value": "foo" }, { "param": "email", "msg": "required", "value": "foo.com" }]`
 
 ## Email Taken
 If the supplied email is already registered to another account, a statusCode of `409` will be returned. The response will include the following fields
