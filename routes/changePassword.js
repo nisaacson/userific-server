@@ -6,6 +6,7 @@
  * @param  {Function} next the restify handler to pass control to the next middleware in line
  */
 var restify = require('restify')
+var inspect = require('eyespect').inspector()
 module.exports = function(backend) {
   return function(req, res, next) {
     var params = req.params
@@ -20,13 +21,15 @@ module.exports = function(backend) {
       password: params.currentPassword
     }
     backend.authenticate(authParams, function(err, user) {
+      var outputError, msg
       if (err) {
-        var msg = err.message
-        var outputError = new restify.InternalError(msg)
+        msg = err.message
+        outputError = new restify.InternalError(msg)
         return next(outputError)
       }
       if (!user) {
-        res.send(new restify.InvalidCredentialsError('user not found'))
+        outputError = new restify.InvalidCredentialsError('user not found')
+        outputError.body.reason = 'authenticate_failed'
         return
       }
       backend.changePassword(params, function(err, user) {

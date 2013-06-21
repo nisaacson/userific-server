@@ -31,6 +31,6 @@ module.exports = function(backend, serverConfig, registerCallback, generatePassw
   server.post('/changeEmail', changeEmail(backend))
   server.post('/changePassword', changePassword(backend))
   server.post('/generatePasswordResetToken', generatePasswordResetToken(backend, generatePasswordResetTokenCallback))
-  server.get('/resetPassword', resetPassword(backend))
+  server.post('/resetPassword', resetPassword(backend))
   return server
 }

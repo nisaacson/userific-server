@@ -19,15 +19,24 @@ module.exports = function(backend) {
       }
     backend.resetPassword(params, function(err, newPassword) {
       var output, outputError
-      if (err) {
-        var msg = err.message
-        outputError = new restify.InternalError(msg)
-        return next(outputError)
-      }
+
       if (err && err.reason === 'invalid_token') {
         outputError = new restify.InvalidCredentialsError('invalid reset token')
         outputError.body.reason = err.reason
         return res.send(outputError)
+      }
+      if (err && err.reason === 'unconfirmed') {
+        outputError = new restify.NotAuthorized('user is not confirmed')
+        outputError.body.reason = err.reason
+        return res.send(outputError)
+      }
+      if (err) {
+        var msg = err.message
+        outputError = new restify.InternalError(msg)
+        if (err.reason) {
+          outputError.body.reason = err.reason
+        }
+        return next(outputError)
       }
       output = {
         message: 'password reset correctly',

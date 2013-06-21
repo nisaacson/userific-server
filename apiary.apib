@@ -411,3 +411,83 @@ GET /ping
 < 200
 < Content-Type: application/json
 { "message": "pong"}
+
+
+
+When resetting a passsword, the following fields are required
+
+* `resetToken` - the token emailed to the user from the generatePasswordResetToken request
+
+## Success
+
+If the `resetPassword` request completes correctly, a status code of `200` will be returned. A new random password will be returned back in the response which will include the following fields
+
+```javascript
+{
+  "password": "new password here'
+}
+```
+
+## Missing Parameters
+
+If any of the required fields are either missing or invalid, a status code of `409` will be returned. The response will include the following fields
+
+```javascript
+{
+ "code": "MissingParameter",
+ "message": "resetPassword failed",
+ "reason": "missing_parameter",
+ "errors": [
+   { "param": "resetToken", "msg": "required" }
+ ]
+}
+```
+
+## Unconfirmed User
+
+If the endpoint is called with an email address for a user who has registered but not yet confirmed their email, a status code of `403` will be returned. The response body will include the following fields:
+
+```javascript
+{
+ "code": "NotAuthorized",
+ "message": "resetToken",
+ "reason": "unconfirmed"
+}
+```
+
+## Invalid Token
+
+If the endpoint is called with a `resetToken` that does not exist in the database, a status code of `401` will be returned. The response body will include the following fields:
+
+```javascript
+{
+ "code": "NotAuthorized",
+ "message": "resetToken",
+ "reason": "invalid_token"
+}
+```
+
+POST /resetPassword
+> Content-Type: application/json
+{ "resetToken":"foo token here" }
+< 200
+< Content-Type: application/json
+{ "password": "new password here" }
++++++
+< 403
+< Content-Type: application/json; charset=utf-8
+{"code":"Forbidden","message":"resetPassword failed", "reason": "unconfirmed" }
++++++
+< 409
+< Content-Type: application/json; charset=utf-8
+{"code": "MissingParameter", "message": "resetToken", "reason": "missing_parameter", errors": [ { "param": "email", "msg": "required" } ] }
++++++
+< 401
+< Content-Type: application/json; charset=utf-8
+{"code":"InvalidCredentials","message":"resetPassword failed", "reason": "invalid_token" }
+
+Ping the server to make sure it online
+GET /ping
+< 200
+< Content-Type: application/json
+{ "message": "pong"}
