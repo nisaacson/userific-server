@@ -26,11 +26,11 @@ module.exports = function(backend, serverConfig, registerCallback, generatePassw
   server.use(restify.queryParser())
   server.use(restifyValidator)
   server.post('/register', register(backend, registerCallback))
-  server.post('/confirmEmail', confirmEmail(backend))
+  server.get('/confirmEmail', confirmEmail(backend))
   server.post('/authenticate', authenticate(backend))
   server.post('/changeEmail', changeEmail(backend))
   server.post('/changePassword', changePassword(backend))
   server.post('/generatePasswordResetToken', generatePasswordResetToken(backend, generatePasswordResetTokenCallback))
-  server.post('/resetPassword', resetPassword(backend))
+  server.get('/resetPassword', resetPassword(backend))
   return server
 }

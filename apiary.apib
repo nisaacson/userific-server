@@ -84,6 +84,74 @@ POST /register
 {"code": "MissingParameter", "message": "Register failed", "errors": [ { "param": "password", "msg": "password must be at least 4 characters long" }]}
 
 
+Confirm email for new Register
+
+After a user registers for an account, they need to be able to confirm their email. A confirmToken gets generated on each registration and sent to the user somehow, most likely via email. The email contains a link to this `confirmEmail` route with a GET parameter containing the confirmToken
+
+* `confirmToken` - confirmation token emailed to the user
+
+
+## Valid Confirmation
+
+If the `confirmEmail` request completes correctly, a status code of `200` will be returned. The response will include the following fields
+
+```
+{
+  "_id": "the id of the user record in the backend datastore"
+ "email": "the email address stored in the backend datastore. This should be the same as the input email"
+}
+```
+
+## Missing token
+If either the `confirmToken` is missing, a statusCode of `409` will be returned allow with the response
+
+```javascript
+{
+  "code": "MissingParameter",
+  "messge": "register failed",
+  "reason": "missing_parameters",
+  "errors": [
+    { "param": "confirmToken", "msg": "required", "value": "" }
+  ]
+}
+```
+
+## Invalid Token
+If the supplied `confirmToken` is not found in the database, a statusCode of `403` will be returned along with the response
+
+```javascript
+{
+  "code": "NotAuthorized",
+  "messge": "confirmEmail failed",
+  "reason": "invalid_token"
+}
+```
+
+## Internal Errors
+
+If there is an error in the server or an error querying the database, a status cod of `500` will be returned. The response will include the following fields
+
+```javascript
+{
+  "code": "InternalError",
+  "messge": "confirmEmail failed",
+}
+```
+
+GET /confirmEmail?confirmToken=asdf34vfdsfsdaoj29dkscnasd02ondwfoij
+> Content-Type: application/json
+< 200
+< Content-Type: application/json
+{ "_id": "fooUserID", "email": "foo@example.com" }
++++++
+< 409
+< Content-Type: application/json; charset=utf-8
+{"code": "MissingParameter", "message": "Register failed", "reason": "missing_parameter", "errors": [ { "confirmToken": "email", "msg": "required" }]}
++++++
+< 403
+< Content-Type: application/json; charset=utf-8
+{"code": "NotAuthorized", "message": "Confirm Email failed", "reason": "invalid_token" }
+
 
 Authenticate an existing user account
 
