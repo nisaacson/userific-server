@@ -165,7 +165,7 @@ If either the username or password is missing, a status code of `409` will be re
 * `"message": "authenticate failed"`
 * `"reason": "missing_paramters"`
 * `"code": "MissingParameter"`
-* "errors": ["param": "email", "msg": "required", "param": "password", "msg": "required"]`
+* `"errors": ["param": "email", "msg": "required", "param": "password", "msg": "required"]`
 
 
 Finally if there is an error in the server or an error querying the database, a status cod of `500` will be returned. The response body will include the fields
