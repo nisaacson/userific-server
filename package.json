@@ -1,6 +1,6 @@
 {
   "name": "userific-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A restful api server to manage users in your application. The server can be used with any userfic backends.",
   "main": "index.js",
   "directories": {
