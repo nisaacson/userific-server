@@ -69,7 +69,7 @@ describe('PostGRE backend routes', function() {
   it('register post route should be supported', function(done) {
     testRegister(baseURL, user, done)
   })
-  it.only('register post route should be give error when registering duplicate email', function(done) {
+  it('register post route should be give error when registering duplicate email', function(done) {
     testRegister(baseURL, user, function(err, body) {
       var opts = {
         url: baseURL + '/register',
