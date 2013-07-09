@@ -461,3 +461,80 @@ GET /ping
 < 200
 < Content-Type: application/json
 { "message": "pong"}
+
+
+Grant role for an existing user
+
+When granting a role for a user, the following fields are required
+
+* `adminEmail`    - the email address of an existing adminstrator account
+* `adminPassword` - the password for an existing administrator account
+* `email`         - the email address of the user to whom the system will grant the role
+* `role`          - the role to grant, which should be one of `['user', 'staff', 'admin']`
+
+
+## Success
+
+If the `grantRoleForEmail` request completes correctly, a status code of `201` will be returned. The response will look as follows
+
+```javascript
+{
+  role: 'staff',
+  email: 'foo@example.com',
+  message: 'role granted successfully'
+}
+```
+
+## Invalid Admin credentials
+
+If the supplied admin user email or password are incorrect, a status code of `401` will be returned. The response will include the following fields
+
+```javascript
+{
+  "code":"InvalidCredentials",
+  "message":"user not found",
+  "reason": "not_authorized"
+}
+```
+
+## Invalid Role
+
+If the supplied `role` is not a valid role name, a status code of `409` will be returned. The response will look as follows
+{
+  code: 'InvalidArgument',
+  message: 'failed to get role',
+  error: 'invalid role name',
+  reason: 'role_not_found'
+}
+
+## Missing Parameters
+
+If any of the required fields are either missing or invalid, a status code of `409` will be returned. The response will include the following fields
+
+```javascript
+{
+ "code": "MissingParameter",
+ "message": "changePassword failed",
+ "errors": [
+   { "param": "adminEmail", "msg": "required" },
+   { "param": "adminPassword", "msg": "required" },
+   { "param": "email", "msg": "required" }
+   { "param": "role", "msg": "required" }
+ ]
+}
+```
+
+POST /grantRoleForEmail
+> Content-Type: application/json
+{ "adminEmail": "admin@example.com", "adminPassword": "barPassword" email":"foo@example.com", "role": "staff" }
+< 201
+< Content-Type: application/json
+{ "role": "staff", "email": "foo@example.com", "message": "role granted successfully" }
++++++
+< 401
+< Content-Type: application/json; charset=utf-8
+{"code":"InvalidCredentials","message":"user not found", "reason": "not_authorized"}
++++++
+< 409
+< Content-Type: application/json; charset=utf-8
+{"code": "MissingParameter", "message": "changePassword failed", "errors": [ { "param": "adminEmail", "msg": "required" }, { "param": "adminPassword", "msg": "required" }, { "param": "email", "msg": "required" }, { "param": "role", "msg": "required" }]}

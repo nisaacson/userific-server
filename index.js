@@ -7,6 +7,7 @@ var confirmEmail = require('./routes/confirmEmail')
 var changeEmail = require('./routes/changeEmail')
 var changePassword = require('./routes/changePassword')
 var resetPassword = require('./routes/resetPassword')
+var grantRoleForEmail = require('./routes/grantRoleForEmail')
 var generatePasswordResetToken = require('./routes/generatePasswordResetToken')
 module.exports = function(backend, serverConfig, registerCallback, generatePasswordResetTokenCallback) {
   var server = restify.createServer(serverConfig)
@@ -30,6 +31,7 @@ module.exports = function(backend, serverConfig, registerCallback, generatePassw
   server.post('/authenticate', authenticate(backend))
   server.post('/changeEmail', changeEmail(backend))
   server.post('/changePassword', changePassword(backend))
+  server.post('/grantRoleForEmail', grantRoleForEmail(backend))
   server.post('/generatePasswordResetToken', generatePasswordResetToken(backend, generatePasswordResetTokenCallback))
   server.post('/resetPassword', resetPassword(backend))
   return server

@@ -14,6 +14,7 @@ var userificServer = require('../../')
 var request = require('request')
 var backend
 var registeredUserEmail = 'buzz@example.com'
+var registeredUserPassword = 'barPassword2'
 
 describe('PostGRE backend routes', function() {
   this.timeout('10s')
@@ -74,9 +75,13 @@ describe('PostGRE backend routes', function() {
       client.query(query, function(err) {
         should.not.exist(err)
         var userID = uuid.v4()
-        var hash = 'fooPasswordHash'
-        var email = registeredUserEmail
-        client.query('INSERT INTO users (id, email, password, confirmed) VALUES ($1, $2, $3, $4)', [userID, email, hash, false], done)
+        backend.hashPassword(registeredUserPassword, function(err, hash) {
+          should.not.exist(err)
+          client.query('INSERT INTO users (id, email, password, confirmed) VALUES ($1, $2, $3, $4)', [userID, registeredUserEmail, hash, true], function (err) {
+            should.not.exist(err)
+            backend.grantRoleForEmail('admin', registeredUserEmail, done)
+          })
+        })
       })
     })
   })
@@ -185,6 +190,75 @@ describe('PostGRE backend routes', function() {
             res.statusCode.should.eql(200)
             body.email.should.eql(changeEmailOpts.form.newEmail)
             done()
+          })
+        })
+      })
+    })
+  })
+
+  it('should support the grantRoleForEmail post route', function(done) {
+    testRegister(baseURL, user, function(err, body) {
+      getConfirmTokenForEmail(client, user.email, function(err, confirmToken) {
+        testConfirmEmail(baseURL, confirmToken, function(err, body) {
+          var role = 'staff'
+          var opts = {
+            url: baseURL + '/grantRoleForEmail',
+            method: 'post',
+            form: {
+              adminEmail: registeredUserEmail,
+              adminPassword: registeredUserPassword,
+              email: user.email,
+              role: role
+            },
+            json: true
+          }
+          request(opts, function(err, res, body) {
+            should.not.exist(err, 'error posting to grantRoleForEmail route')
+            if (res.statusCode !== 201) {
+              inspect(body, 'grant role body')
+            }
+            res.statusCode.should.eql(201)
+            inspect(body,'body')
+            backend.getRolesForEmail(user.email, function (err, roles) {
+              should.not.exist(err)
+              roles.length.should.eql(1)
+              roles[0].should.eql(role)
+              done()
+            })
+          })
+        })
+      })
+    })
+  })
+
+  it('should give error when posting to grantRoleForEmail route with invalid role', function(done) {
+    testRegister(baseURL, user, function(err, body) {
+      getConfirmTokenForEmail(client, user.email, function(err, confirmToken) {
+        testConfirmEmail(baseURL, confirmToken, function(err, body) {
+          var role = 'foobar'
+          var opts = {
+            url: baseURL + '/grantRoleForEmail',
+            method: 'post',
+            form: {
+              adminEmail: registeredUserEmail,
+              adminPassword: registeredUserPassword,
+              email: user.email,
+              role: role
+            },
+            json: true
+          }
+          request(opts, function(err, res, body) {
+            should.not.exist(err, 'error posting to grantRoleForEmail route')
+            if (res.statusCode !== 409) {
+              inspect(body, 'invalid grant role body')
+            }
+            res.statusCode.should.eql(409)
+            res.body.code.should.eql('InvalidArgument')
+            backend.getRolesForEmail(user.email, function (err, roles) {
+              should.not.exist(err)
+              roles.length.should.eql(0)
+              done()
+            })
           })
         })
       })
