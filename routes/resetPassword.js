@@ -17,7 +17,7 @@ module.exports = function(backend) {
         outputError.body.reason = 'missing_parameter'
         return res.send(outputError)
       }
-    backend.resetPassword(params, function(err, newPassword) {
+    backend.resetPassword.call(backend, params, function(err, newPassword) {
       var output, outputError
 
       if (err && err.reason === 'invalid_reset_token') {

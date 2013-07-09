@@ -1,3 +1,4 @@
+var moment = require('moment')
 var uuid = require('uuid')
 var path = require('path')
 var inspect = require('eyespect').inspector()
@@ -46,6 +47,18 @@ describe('PostGRE backend routes', function() {
       res.send(200, user)
     }
     backend = new UserificPostGRES(postgresConfig)
+    var logRegister = function(register) {
+      return function(data, cb) {
+        var self = this
+        var start = moment()
+        register.call(self, data, function(err, user) {
+          cb(err, user)
+        })
+      }
+    }
+    var backendRegister = backend.register
+    var newRegister = logRegister.call(backend, backendRegister)
+    backend.register = newRegister
     serverConfig = {}
     server = userificServer(backend, serverConfig, registerCallback, generatePasswordResetTokenCallback)
     should.exist(server, 'server object not returned')
@@ -77,7 +90,7 @@ describe('PostGRE backend routes', function() {
         var userID = uuid.v4()
         backend.hashPassword(registeredUserPassword, function(err, hash) {
           should.not.exist(err)
-          client.query('INSERT INTO users (id, email, password, confirmed) VALUES ($1, $2, $3, $4)', [userID, registeredUserEmail, hash, true], function (err) {
+          client.query('INSERT INTO users (id, email, password, confirmed) VALUES ($1, $2, $3, $4)', [userID, registeredUserEmail, hash, true], function(err) {
             should.not.exist(err)
             backend.grantRoleForEmail('admin', registeredUserEmail, done)
           })
@@ -218,7 +231,7 @@ describe('PostGRE backend routes', function() {
               inspect(body, 'grant role body')
             }
             res.statusCode.should.eql(201)
-            backend.getRolesForEmail(user.email, function (err, roles) {
+            backend.getRolesForEmail(user.email, function(err, roles) {
               should.not.exist(err)
               roles.length.should.eql(1)
               roles[0].should.eql(role)
@@ -253,7 +266,7 @@ describe('PostGRE backend routes', function() {
             }
             res.statusCode.should.eql(409)
             res.body.code.should.eql('InvalidArgument')
-            backend.getRolesForEmail(user.email, function (err, roles) {
+            backend.getRolesForEmail(user.email, function(err, roles) {
               should.not.exist(err)
               roles.length.should.eql(0)
               done()

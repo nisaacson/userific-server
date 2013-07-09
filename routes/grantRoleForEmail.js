@@ -21,7 +21,7 @@ module.exports = function(backend) {
       if (err) return res.send(err)
       var email = params.email
       var role = params.role
-      backend.grantRoleForEmail(role, email, function (err, reply) {
+      backend.grantRoleForEmail.call(backend, role, email, function (err, reply) {
         var outputError
         if (err) {
           var msg = err.message

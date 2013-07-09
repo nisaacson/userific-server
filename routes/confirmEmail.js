@@ -15,7 +15,7 @@ module.exports = function(backend) {
       outputError.body.errors = errors
       return res.send(outputError)
     }
-    backend.confirmEmail(params, function (err, user) {
+    backend.confirmEmail.call(backend, params, function (err, user) {
       if (err) {
         var msg = err.message
         var outputError = new restify.InternalError(msg)

@@ -38,6 +38,7 @@ describe('Register Route', function() {
     var generatePasswordResetTokenCallback = function(req, res, user) {
       console.log('mock generatePasswordResetTokenCallback called')
     }
+
     server = userificServer(backend, serverConfig, registerCallback, generatePasswordResetTokenCallback)
     should.exist(server, 'server object not returned')
     server.listen(0)

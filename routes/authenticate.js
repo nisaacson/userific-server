@@ -16,7 +16,7 @@ module.exports = function(backend) {
       outputError.body.reason = 'missing_parameter'
       return res.send(outputError)
     }
-    backend.authenticate(params, function (err, user) {
+    backend.authenticate.call(backend, params, function (err, user) {
       var outputError
 
       if (err && err.reason === 'unconfirmed') {

@@ -20,7 +20,7 @@ module.exports = function(backend) {
       email: params.email,
       password: params.currentPassword
     }
-    backend.authenticate(authParams, function(err, user) {
+    backend.authenticate.call(backend, authParams, function(err, user) {
       var outputError, msg
       if (err) {
         msg = err.message
@@ -32,7 +32,7 @@ module.exports = function(backend) {
         outputError.body.reason = 'authenticate_failed'
         return
       }
-      backend.changePassword(params, function(err, user) {
+      backend.changePassword.call(backend, params, function(err, user) {
         if (err) {
           var msg = err.message
           var outputError = new restify.InternalError(msg)

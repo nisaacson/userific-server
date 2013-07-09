@@ -20,7 +20,7 @@ module.exports = function(backend) {
       email: params.currentEmail,
       password: params.password
     }
-    backend.authenticate(authParams, function(err, user) {
+    backend.authenticate.call(backend, authParams, function(err, user) {
       if (err) {
         var msg = err.message
         var outputError = new restify.InternalError(msg)
@@ -30,7 +30,7 @@ module.exports = function(backend) {
         res.send(new restify.InvalidCredentialsError('user not found'))
         return
       }
-      backend.changeEmail(params, function(err, user) {
+      backend.changeEmail.call(backend, params, function(err, user) {
         if (err) {
           var msg = err.message
           var outputError = new restify.InternalError(msg)

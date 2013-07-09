@@ -15,7 +15,7 @@ module.exports = function(backend, cb) {
       outputError.body.errors = errors
       return res.send(outputError)
     }
-    backend.register(params, function (err, user) {
+    backend.register.call(backend, params, function (err, user) {
       if (err && err.reason) {
         outputError = new restify.InvalidArgumentError('register failed')
         outputError.body.reason = err.reason
