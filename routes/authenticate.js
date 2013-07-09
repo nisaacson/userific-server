@@ -1,4 +1,3 @@
-var inspect = require('eyespect').inspector()
 var restify = require('restify')
 /**
  * authenticate an existing user route. This route should be called via POST request

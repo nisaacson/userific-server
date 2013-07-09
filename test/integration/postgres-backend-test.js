@@ -1,3 +1,4 @@
+var uuid = require('uuid')
 var path = require('path')
 var inspect = require('eyespect').inspector()
 var configFilePath = path.join(__dirname, 'postgres.json')
@@ -5,13 +6,15 @@ var config = require('nconf').file({
   file: configFilePath
 })
 var postgresConfig = config.get('postgres')
-var table = postgresConfig.table
 var UserificPostGRES = require('userific-postgres')
 var restify = require('restify')
 var ce = require('cloneextend')
 var should = require('should')
 var userificServer = require('../../')
 var request = require('request')
+var backend
+var registeredUserEmail = 'buzz@example.com'
+
 describe('PostGRE backend routes', function() {
   this.timeout('10s')
   var baseURL, port, server, user, client, registerOpts
@@ -30,7 +33,7 @@ describe('PostGRE backend routes', function() {
     }
   }
   before(function(done) {
-    var backend, serverConfig
+    var serverConfig
     var registerCallback = function(req, res, user) {
       user.fakeConfirmToken = user.confirmToken;
       delete user.confirmToken
@@ -61,9 +64,21 @@ describe('PostGRE backend routes', function() {
       })
     })
   })
+
+
   beforeEach(function(done) {
-    var query = 'DELETE FROM ' + postgresConfig.table
-    client.query(query, done)
+    var query = 'DELETE FROM users'
+    client.query(query, function(err) {
+      should.not.exist(err)
+      var query = 'DELETE FROM access_tokens'
+      client.query(query, function(err) {
+        should.not.exist(err)
+        var userID = uuid.v4()
+        var hash = 'fooPasswordHash'
+        var email = registeredUserEmail
+        client.query('INSERT INTO users (id, email, password, confirmed) VALUES ($1, $2, $3, $4)', [userID, email, hash, false], done)
+      })
+    })
   })
 
   it('register post route should be supported', function(done) {
@@ -93,7 +108,7 @@ describe('PostGRE backend routes', function() {
   it('confirmEmail get route should be supported', function(done) {
     testRegister(baseURL, user, function(err, body) {
       getConfirmTokenForEmail(client, user.email, function(err, confirmToken) {
-        testConfirmUser(baseURL, confirmToken, done)
+        testConfirmEmail(baseURL, confirmToken, done)
       })
     })
   })
@@ -101,7 +116,7 @@ describe('PostGRE backend routes', function() {
   it('authenticate post route should be supported', function(done) {
     testRegister(baseURL, user, function(err, body) {
       getConfirmTokenForEmail(client, user.email, function(err, confirmToken) {
-        testConfirmUser(baseURL, confirmToken, function(err, body) {
+        testConfirmEmail(baseURL, confirmToken, function(err, body) {
           testAuthenticate(baseURL, user, done)
         })
       })
@@ -152,7 +167,7 @@ describe('PostGRE backend routes', function() {
   it('changeEmail post route should be supported', function(done) {
     testRegister(baseURL, user, function(err, body) {
       getConfirmTokenForEmail(client, user.email, function(err, confirmToken) {
-        testConfirmUser(baseURL, confirmToken, function(err, body) {
+        testConfirmEmail(baseURL, confirmToken, function(err, body) {
           var newEmail = 'newEmail2@example.com'
           var changeEmailOpts = {
             url: baseURL + '/changeEmail',
@@ -179,7 +194,7 @@ describe('PostGRE backend routes', function() {
   it('generatePasswordResetToken post route should be supported', function(done) {
     testRegister(baseURL, user, function(err, body) {
       getConfirmTokenForEmail(client, user.email, function(err, confirmToken) {
-        testConfirmUser(baseURL, confirmToken, function(err, body) {
+        testConfirmEmail(baseURL, confirmToken, function(err, body) {
           testGeneratePasswordResetToken(baseURL, user, done)
         })
       })
@@ -189,7 +204,7 @@ describe('PostGRE backend routes', function() {
   it('resetPassword post route should be supported', function(done) {
     testRegister(baseURL, user, function(err, body) {
       getConfirmTokenForEmail(client, user.email, function(err, confirmToken) {
-        testConfirmUser(baseURL, confirmToken, function(err, body) {
+        testConfirmEmail(baseURL, confirmToken, function(err, body) {
           testGeneratePasswordResetToken(baseURL, user, function(err, resetToken) {
             var resetPasswordOpts = {
               url: baseURL + '/resetPassword',
@@ -220,7 +235,7 @@ describe('PostGRE backend routes', function() {
   it('resetPassword post route should give error when invalid token is used', function(done) {
     testRegister(baseURL, user, function(err, body) {
       getConfirmTokenForEmail(client, user.email, function(err, confirmToken) {
-        testConfirmUser(baseURL, confirmToken, function(err, body) {
+        testConfirmEmail(baseURL, confirmToken, function(err, body) {
           testGeneratePasswordResetToken(baseURL, user, function(err, resetToken) {
             var fakeResetToken = 'fake reset token here'
             fakeResetToken.should.not.eql(resetToken)
@@ -235,6 +250,9 @@ describe('PostGRE backend routes', function() {
             }
             request(resetPasswordOpts, function(err, res, body) {
               should.not.exist(err, 'error posting to resetPassword route')
+              if (res.statusCode !== 401) {
+                inspect(body, 'invalid reset body')
+              }
               res.statusCode.should.eql(401)
               body.code.should.eql('InvalidCredentials')
               should.not.exist(body.password)
@@ -254,7 +272,7 @@ describe('PostGRE backend routes', function() {
   it('changePassword post route should be supported', function(done) {
     testRegister(baseURL, user, function(err, body) {
       getConfirmTokenForEmail(client, user.email, function(err, confirmToken) {
-        testConfirmUser(baseURL, confirmToken, function(err, body) {
+        testConfirmEmail(baseURL, confirmToken, function(err, body) {
           var newPassword = 'newBarPassword2'
           var changePasswordOpts = {
             url: baseURL + '/changePassword',
@@ -284,7 +302,7 @@ describe('PostGRE backend routes', function() {
 
 
 function getConfirmTokenForEmail(client, email, cb) {
-  var query = 'SELECT confirm_token from ' + table + ' where email = $1'
+  var query = 'SELECT confirm_token from users where email = $1'
   client.query(query, [email], function(err, reply) {
     should.not.exist(err, 'error getting confirm code')
     var rows = reply.rows
@@ -297,20 +315,41 @@ function getConfirmTokenForEmail(client, email, cb) {
 }
 
 function testRegister(baseURL, user, cb) {
-  var opts = {
-    url: baseURL + '/register',
-    method: 'post',
-    form: {
-      email: user.email,
-      password: user.password
-    },
-    json: true
-  }
-  request(opts, function(err, res, body) {
-    should.not.exist(err, 'error registering user')
-    res.statusCode.should.eql(201, 'wrong status code after registering user')
-    body.email.should.eql(user.email, 'incorrect email in register body')
-    cb(null, body)
+  saveAccessTokenForEmail(registeredUserEmail, function(err, accessToken) {
+    if (err) {
+      return cb(err)
+    }
+    var opts = {
+      url: baseURL + '/register',
+      method: 'post',
+      form: {
+        email: user.email,
+        password: user.password,
+        accessToken: accessToken
+      },
+      json: true
+    }
+    request(opts, function(err, res, body) {
+      should.not.exist(err, 'error registering user')
+      if (res.statusCode !== 201) {
+        inspect(body, 'invalid register body')
+      }
+      res.statusCode.should.eql(201, 'wrong status code after registering user')
+      body.email.should.eql(user.email, 'incorrect email in register body')
+      cb(null, body)
+    })
+  })
+}
+
+function saveAccessTokenForEmail(email, cb) {
+  var accessToken = uuid.v4()
+  backend.saveAccessTokenForEmail(email, accessToken, function(err, reply) {
+    should.not.exist(err)
+    backend.getAccessTokensForEmail(email, function(err, tokens) {
+      should.not.exist(err)
+      tokens.length.should.eql(1)
+      cb(null, accessToken)
+    })
   })
 }
 
@@ -329,7 +368,7 @@ function testAuthenticate(baseURL, user, cb) {
 }
 
 
-function testConfirmUser(baseURL, confirmToken, cb) {
+function testConfirmEmail(baseURL, confirmToken, cb) {
   var opts = {
     url: baseURL + '/confirmEmail',
     method: 'post',

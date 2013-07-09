@@ -433,7 +433,7 @@ If the endpoint is called with a `resetToken` that does not exist in the databas
 {
  "code": "InvalidCredentials",
  "message": "resetToken",
- "reason": "invalid_token"
+ "reason": "invalid_reset_token"
 }
 ```
 
@@ -454,7 +454,7 @@ POST /resetPassword
 +++++
 < 401
 < Content-Type: application/json; charset=utf-8
-{"code":"InvalidCredentials","message":"resetPassword failed", "reason": "invalid_token" }
+{"code":"InvalidCredentials","message":"resetPassword failed", "reason": "invalid_reset_token" }
 
 Ping the server to make sure it online
 GET /ping

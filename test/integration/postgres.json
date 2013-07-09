@@ -5,6 +5,6 @@
     "user": "",
     "pass": "",
     "db": "userific-test",
-    "table": "users"
+    "useAccessTokens": true
   }
 }

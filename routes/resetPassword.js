@@ -20,7 +20,7 @@ module.exports = function(backend) {
     backend.resetPassword(params, function(err, newPassword) {
       var output, outputError
 
-      if (err && err.reason === 'invalid_token') {
+      if (err && err.reason === 'invalid_reset_token') {
         outputError = new restify.InvalidCredentialsError('invalid reset token')
         outputError.body.reason = err.reason
         return res.send(outputError)
