@@ -25,10 +25,11 @@ The following is a section of resources related to user management. The userific
 
 Register a new user account
 
-When registering a user account, the following fields are required
+When registering a user account, the following fields are required. If you are setting up a beta site, you may wish to restrict new registrations to only people that have been invitated by an existing a user. In this case, a valid `accessToken` must be supplied during registration requests
 
-* `email`    - the email address used to login to the account
-* `password` - the password used to login to the account'
+* `email`       - the email address used to login to the account
+* `password`    - the password used to login to the account'
+* `accessToken` - only if the backend is configured to use access tokens
 
 
 ## Valid Registration
