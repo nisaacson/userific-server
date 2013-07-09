@@ -29,8 +29,9 @@
     "restify": "~2.6.0",
     "restify-validator": "~0.3.1",
     "should": "~1.2.2",
-    "userific-postgres": "~0.1.10",
-    "async": "~0.2.9"
+    "userific-postgres": "~0.1.11",
+    "async": "~0.2.9",
+    "userific-server": "~0.1.4"
   },
   "devDependencies": {
     "eyespect": "~0.1.10",
