@@ -218,7 +218,6 @@ describe('PostGRE backend routes', function() {
               inspect(body, 'grant role body')
             }
             res.statusCode.should.eql(201)
-            inspect(body,'body')
             backend.getRolesForEmail(user.email, function (err, roles) {
               should.not.exist(err)
               roles.length.should.eql(1)
