@@ -17,6 +17,7 @@ The following is a section of resources related to user management. The userific
 * [/changeEmail](#post-%2FchangeEmail)
 * [/changePassword](#post-%2FchangePassword)
 * [/resetPassword](#post-%2FresetPassword)
+* [/grantRoleForEmail](#post-%2FgrantRoleForEmail)
 * [/ping](#get-%2Fping)
 
 --
@@ -215,17 +216,14 @@ If the `changeEmail` request completes correctly, a status code of `200` will be
 
 If one or more of the posted parameters is either missing or incorrect, a status code of `409` will be returned. The response will include the following fields
 
-```javascript
-{
-  "code": "MissingParameter",
-  "message": "changeEmail failed",
-  "errors": [
+* `"code": "MissingParameter"`
+* `"message": "changeEmail failed"`
+* `"errors": [
     { "param": "currentEmail", "msg": "required" },
     { "param": "newEmail", "msg": "required" },
     { "param": "password", "msg": "required" }
-  ]
-}
-```
+  ]`
+
 
 ## Invalid Password
 
